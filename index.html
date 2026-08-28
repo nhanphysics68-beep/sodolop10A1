@@ -99,10 +99,15 @@
   .swap-tool{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:14px;}
   .swap-tool select{padding:7px; border:1.5px solid var(--line); border-radius:7px; font-size:12.5px;}
 
+  .page-logo{position:absolute; top:14px; left:14px; width:64px; height:auto; z-index:10;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));}
+  @media (max-width:520px){ .page-logo{width:44px; top:10px; left:10px;} }
+
   footer{text-align:center; font-size:12px; color:var(--ink-soft); margin-top:6px;}
 </style>
 </head>
 <body>
+<img src="1.png" alt="Logo Trường THCS &amp; THPT Hòa Thuận" class="page-logo">
 <div class="wrap">
   <h1 class="title">Sơ đồ lớp 10A1</h1>
   <p class="subtitle">Nhìn từ trên xuống · 12h: bảng lớp · 11h: cửa ra vào · 1h: bàn giáo viên · 6h: cuối lớp</p>
