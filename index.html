@@ -180,9 +180,23 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-const SEATS_KEY = "lop10a1-seats-v2";
-const SWAPS_KEY = "lop10a1-swaps-v2";
+const firebaseConfig = {
+  apiKey: "AIzaSyA-SI1MkDOCCEFSyvUU2McqtZGSd5CEbkw",
+  authDomain: "sodolop10a1.firebaseapp.com",
+  databaseURL: "https://sodolop10a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sodolop10a1",
+  storageBucket: "sodolop10a1.firebasestorage.app",
+  messagingSenderId: "920106392128",
+  appId: "1:920106392128:web:4739789c3705a57d9b9da5"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const seatsRef = db.ref('lop10a1/seats');
+const swapsRef = db.ref('lop10a1/swaps');
+
 const ADMIN_PASSWORD = "hoathuan2026";
 
 const LANES = [ {id:1, desks:7}, {id:2, desks:6}, {id:3, desks:6}, {id:4, desks:6} ];
@@ -205,14 +219,37 @@ function escapeHtml(str){
 }
 
 async function loadAll(){
-  try{ const r = await window.storage.get(SEATS_KEY, true); seats = r? JSON.parse(r.value) : {}; }
+  try{ const snap = await seatsRef.once('value'); seats = snap.val() || {}; }
   catch(e){ seats = {}; }
-  allSeatIds().forEach(id=>{ if(!(id in seats)) seats[id] = null; });
-  try{ const r = await window.storage.get(SWAPS_KEY, true); swaps = r? JSON.parse(r.value) : []; }
-  catch(e){ swaps = []; }
+  try{
+    const snap = await swapsRef.once('value');
+    const val = snap.val() || {};
+    swaps = Object.keys(val).map(k=> ({id:k, ...val[k]}));
+  }catch(e){ swaps = []; }
 }
-async function saveSeats(){ await window.storage.set(SEATS_KEY, JSON.stringify(seats), true); }
-async function saveSwaps(){ await window.storage.set(SWAPS_KEY, JSON.stringify(swaps), true); }
+
+// Ghi/xóa 1 ô chỗ ngồi trên Firebase (không đụng tới các ô khác)
+async function setSeat(id, value){
+  if(value){ seats[id] = value; await seatsRef.child(id).set(value); }
+  else { delete seats[id]; await seatsRef.child(id).remove(); }
+}
+// Tạo 1 yêu cầu đổi chỗ mới trên Firebase
+async function addSwap(swap){
+  const ref = swapsRef.push();
+  await ref.set(swap);
+  swaps.push({id: ref.key, ...swap});
+}
+// Xóa 1 yêu cầu đổi chỗ theo id
+async function removeSwap(id){
+  await swapsRef.child(id).remove();
+  swaps = swaps.filter(s=> s.id !== id);
+}
+// Xóa mọi yêu cầu đổi chỗ liên quan tới 1 ô (khi ô đó bị xóa/đổi)
+async function removeSwapsForSeat(seatId){
+  const related = swaps.filter(s=> s.fromSeatId===seatId || s.toSeatId===seatId);
+  await Promise.all(related.map(s=> swapsRef.child(s.id).remove()));
+  swaps = swaps.filter(s=> s.fromSeatId!==seatId && s.toSeatId!==seatId);
+}
 
 function showMsg(el, text, type){ el.textContent = text; el.className = 'msg show ' + type; setTimeout(()=> el.classList.remove('show'), 3500); }
 
@@ -287,8 +324,7 @@ async function onSeatClick(seatId){
       if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
       await loadAll();
       if(seats[seatId]){ showMsg(document.getElementById('mErr'), 'Rất tiếc, ô này vừa có bạn khác đăng ký trước.', 'err'); render(); closeModal(); return; }
-      seats[seatId] = {name, password:''};
-      await saveSeats();
+      await setSeat(seatId, {name, password:''});
       render();
       openLockStep(seatId, name);
     };
@@ -318,8 +354,7 @@ function openLockStep(seatId, name){
     if(!pass){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập mật khẩu.', 'err'); return; }
     await loadAll();
     if(!seats[seatId] || seats[seatId].name !== name){ closeModal(); render(); return; }
-    seats[seatId].password = pass;
-    await saveSeats();
+    await setSeat(seatId, {name, password:pass});
     render();
     closeModal();
   };
@@ -341,14 +376,14 @@ function openUnlockedEditModal(seatId, data){
     const pass = document.getElementById('mPass').value;
     if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
     await loadAll();
-    seats[seatId] = {name, password:pass};
-    await saveSeats(); render(); closeModal();
+    await setSeat(seatId, {name, password:pass});
+    render(); closeModal();
   };
   document.getElementById('mClear').onclick = async ()=>{
     await loadAll();
-    seats[seatId] = null;
-    swaps = swaps.filter(s=> s.fromSeatId!==seatId && s.toSeatId!==seatId);
-    await saveSeats(); await saveSwaps(); render(); closeModal();
+    await setSeat(seatId, null);
+    await removeSwapsForSeat(seatId);
+    render(); closeModal();
   };
 }
 
@@ -405,20 +440,20 @@ function openLockedSeatModal(seatId, data){
       const newPass = document.getElementById('ownNewPass').value;
       if(!newName) return;
       await loadAll();
-      seats[seatId] = {name:newName, password:newPass};
-      await saveSeats(); render(); closeModal();
+      await setSeat(seatId, {name:newName, password:newPass});
+      render(); closeModal();
     };
     document.getElementById('ownClearBtn').onclick = async ()=>{
       await loadAll();
-      seats[seatId] = null;
-      swaps = swaps.filter(s=> s.fromSeatId!==seatId && s.toSeatId!==seatId);
-      await saveSeats(); await saveSwaps(); render(); closeModal();
+      await setSeat(seatId, null);
+      await removeSwapsForSeat(seatId);
+      render(); closeModal();
     };
     const cancelBtn = document.getElementById('cancelOutBtn');
     if(cancelBtn) cancelBtn.onclick = async ()=>{
       await loadAll();
-      swaps = swaps.filter(s=> s.id !== myOutgoing.id);
-      await saveSwaps(); render(); closeModal();
+      await removeSwap(myOutgoing.id);
+      render(); closeModal();
     };
     document.querySelectorAll('[data-accept]').forEach(b=> b.onclick = ()=> respondSwap(b.getAttribute('data-accept'), true));
     document.querySelectorAll('[data-decline]').forEach(b=> b.onclick = ()=> respondSwap(b.getAttribute('data-decline'), false));
@@ -434,9 +469,7 @@ function openLockedSeatModal(seatId, data){
     if(swaps.some(s=> s.status==='pending' && s.fromSeatId===fromSeatId)){
       showMsg(document.getElementById('reqErr'), 'Bạn đã có 1 yêu cầu đổi chỗ đang chờ, không thể gửi thêm.', 'err'); return;
     }
-    swaps.push({ id:'sw_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
-      fromSeatId, fromName: seats[fromSeatId].name, toSeatId: seatId, toName: data.name, status:'pending' });
-    await saveSwaps();
+    await addSwap({ fromSeatId, fromName: seats[fromSeatId].name, toSeatId: seatId, toName: data.name, status:'pending' });
     showMsg(document.getElementById('pageMsg'), `Đã gửi yêu cầu đổi chỗ tới ${data.name}. Bạn ấy cần chạm vào chỗ của mình để đồng ý.`, 'ok');
     render(); closeModal();
   };
@@ -448,10 +481,9 @@ async function respondSwap(swapId, accept){
   if(!sw || sw.status!=='pending'){ render(); closeModal(); return; }
   if(accept){
     const a = seats[sw.fromSeatId], b = seats[sw.toSeatId];
-    if(a && b){ seats[sw.fromSeatId] = b; seats[sw.toSeatId] = a; await saveSeats(); }
+    if(a && b){ await setSeat(sw.fromSeatId, b); await setSeat(sw.toSeatId, a); }
   }
-  swaps = swaps.filter(s=> s.id !== swapId);
-  await saveSwaps();
+  await removeSwap(swapId);
   render(); closeModal();
 }
 
@@ -493,17 +525,15 @@ function renderAdmin(){
     const pass = document.getElementById(`ap-${id}`).value;
     if(!name) return;
     await loadAll();
-    seats[id] = {name, password:pass};
-    await saveSeats();
+    await setSeat(id, {name, password:pass});
     render(); renderAdmin();
     showMsg(document.getElementById('adminMsg'), 'Đã lưu.', 'ok');
   });
   document.querySelectorAll('[data-clear]').forEach(b=> b.onclick = async ()=>{
     const id = b.getAttribute('data-clear');
     await loadAll();
-    seats[id] = null;
-    swaps = swaps.filter(s=> s.fromSeatId!==id && s.toSeatId!==id);
-    await saveSeats(); await saveSwaps();
+    await setSeat(id, null);
+    await removeSwapsForSeat(id);
     render(); renderAdmin();
   });
 
@@ -516,9 +546,9 @@ document.getElementById('swapBtn').onclick = async ()=>{
   const a = document.getElementById('swapA').value, b = document.getElementById('swapB').value;
   if(a === b) return;
   await loadAll();
-  const tmp = seats[a]; seats[a] = seats[b]; seats[b] = tmp;
-  swaps = swaps.filter(s=> ![a,b].includes(s.fromSeatId) && ![a,b].includes(s.toSeatId));
-  await saveSeats(); await saveSwaps();
+  const tmp = seats[a] || null, other = seats[b] || null;
+  await setSeat(a, other); await setSeat(b, tmp);
+  await removeSwapsForSeat(a); await removeSwapsForSeat(b);
   render(); renderAdmin();
   showMsg(document.getElementById('adminMsg'), 'Đã đổi chỗ.', 'ok');
 };
@@ -526,9 +556,9 @@ document.getElementById('swapBtn').onclick = async ()=>{
 document.getElementById('resetAllBtn').onclick = ()=> document.getElementById('confirmResetModal').classList.add('show');
 document.getElementById('cancelResetBtn').onclick = ()=> document.getElementById('confirmResetModal').classList.remove('show');
 document.getElementById('confirmResetBtn').onclick = async ()=>{
-  seats = {}; allSeatIds().forEach(id=> seats[id]=null);
-  swaps = [];
-  await saveSeats(); await saveSwaps();
+  await seatsRef.remove();
+  await swapsRef.remove();
+  seats = {}; swaps = [];
   document.getElementById('confirmResetModal').classList.remove('show');
   render(); renderAdmin();
   showMsg(document.getElementById('adminMsg'), 'Đã xóa toàn bộ sơ đồ.', 'ok');
@@ -568,9 +598,18 @@ document.getElementById('exportWordBtn').onclick = async ()=>{
   URL.revokeObjectURL(url);
 };
 
-async function refresh(){ await loadAll(); render(); if(adminUnlocked) renderAdmin(); }
-refresh();
-setInterval(refresh, 5000);
+// Lắng nghe thay đổi tức thời từ Firebase — không cần chờ, mọi người thấy ngay
+seatsRef.on('value', snap=>{
+  seats = snap.val() || {};
+  render();
+  if(adminUnlocked) renderAdmin();
+});
+swapsRef.on('value', snap=>{
+  const val = snap.val() || {};
+  swaps = Object.keys(val).map(k=> ({id:k, ...val[k]}));
+  render();
+  if(adminUnlocked) renderAdmin();
+});
 </script>
 </body>
 </html>
