@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sơ đồ lớp học — 10A1</title>
+<style>
+  :root{
+    --leaf:#1f7a4d; --leaf-dark:#14532d; --sky:#eef5f0; --paper:#fffefb;
+    --ink:#1c2b22; --ink-soft:#5b6b60; --clay:#d97706; --line:#d7e6da;
+    --red:#c0392b; --blue:#2b6cb0; --shadow:0 6px 20px rgba(20,83,45,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--sky);
+    background-image:radial-gradient(circle at 8% 0%, rgba(31,122,77,0.10), transparent 40%),
+                      radial-gradient(circle at 100% 15%, rgba(217,119,6,0.08), transparent 35%);
+    font-family:"Trebuchet MS","Segoe UI",sans-serif; color:var(--ink); min-height:100vh;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:24px 16px 60px;}
+
+  h1.title{text-align:center; color:var(--leaf-dark); font-size:clamp(22px,4vw,32px);
+    letter-spacing:1px; margin:4px 0 4px; text-transform:uppercase; font-weight:800;}
+  p.subtitle{text-align:center; color:var(--ink-soft); margin:0 0 22px; font-size:13.5px;}
+
+  .card{background:var(--paper); border:1px solid var(--line); border-radius:14px;
+        box-shadow:var(--shadow); padding:20px; margin-bottom:20px;}
+  .card h2{font-size:15px; color:#fff; background:var(--leaf); display:inline-block;
+        padding:5px 14px; border-radius:8px; margin:0 0 14px;}
+
+  .guide{background:#f7fbf8; border:1.5px dashed var(--line); border-radius:10px;
+    padding:12px 16px; font-size:13px; color:var(--ink-soft); margin-bottom:18px; line-height:1.7;}
+  .guide b{color:var(--leaf-dark);}
+
+  .front-zone{display:grid; grid-template-columns:1fr 1.6fr 1fr; gap:10px; margin-bottom:22px;}
+  .front-box{border-radius:10px; padding:12px 10px; text-align:center; font-size:12.5px; font-weight:700;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;}
+  .door{background:#fff; border:2px dashed var(--blue); color:var(--blue);}
+  .podium{background:linear-gradient(180deg,#eaf5ee,#dff0e4); border:2px solid var(--leaf); color:var(--leaf-dark);}
+  .podium .board{margin-top:4px; width:100%; background:#2f4a3a; color:#eafbee; border-radius:6px; padding:10px 6px; font-size:12px; letter-spacing:1px;}
+  .teacher-desk{background:#fff7ea; border:2px solid var(--clay); color:var(--clay);}
+  .front-box .icon{font-size:20px;}
+
+  .classroom-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:10px;}
+  .lane{display:flex; flex-direction:column; gap:7px; align-items:center;}
+  .lane-label{font-size:11px; color:var(--ink-soft); font-weight:700; margin-bottom:2px;}
+  .desk{display:flex; gap:5px;}
+  .seat{width:38px; height:42px; border-radius:7px; border:2px dashed #b9d4c0; background:#fbfdfb;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:9px; font-weight:700;
+    color:var(--ink-soft); cursor:pointer; text-align:center; line-height:1.05; padding:2px;
+    transition:transform .1s, box-shadow .1s; position:relative; user-select:none;}
+  .seat:hover{transform:translateY(-2px); box-shadow:0 3px 8px rgba(0,0,0,0.12);}
+  .seat.taken{border-style:solid; border-color:#a9c9b6; background:#eaf5ee; color:var(--leaf-dark);}
+  .seat.unlocked{border-color:var(--clay); background:#fff8ec;}
+  .seat.pending{border-color:var(--red);}
+  .seat .lockicon{position:absolute; top:-6px; right:-6px; font-size:11px; background:#fff; border-radius:50%; padding:1px;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,57,43,0.4);}70%{box-shadow:0 0 0 8px rgba(192,57,43,0);}100%{box-shadow:0 0 0 0 rgba(192,57,43,0);}}
+  .seat.pending{animation:pulse 1.4s infinite;}
+
+  .back-label{text-align:center; font-size:12px; font-weight:700; color:var(--ink-soft);
+    letter-spacing:2px; margin-top:8px; border-top:2px solid var(--line); padding-top:10px;}
+
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--ink-soft); margin-top:16px;}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .legend .box{width:14px; height:14px; border-radius:4px; display:inline-block;}
+
+  .btn{font-weight:700; font-size:13px; border:none; border-radius:8px; padding:9px 18px; cursor:pointer;}
+  .btn-primary{background:var(--leaf); color:#fff;}
+  .btn-primary:hover{background:var(--leaf-dark);}
+  .btn-ghost{background:#fff; color:var(--red); border:1.5px solid var(--red);}
+  .btn-ghost:hover{background:#fdecea;}
+  .btn-sm{padding:6px 12px; font-size:12px; border-radius:7px;}
+  .btn-blue{background:var(--blue); color:#fff;}
+  .btn-clay{background:var(--clay); color:#fff;}
+
+  .msg{font-size:13px; padding:9px 12px; border-radius:8px; margin-top:10px; display:none;}
+  .msg.show{display:block;}
+  .msg.ok{background:#eaf7ee; color:var(--leaf-dark); border:1px solid #bfe3c9;}
+  .msg.err{background:#fdecea; color:var(--red); border:1px solid #f4b8b0;}
+  .msg.info{background:#eaf1fb; color:var(--blue); border:1px solid #bcd6f2;}
+
+  .modal-bg{display:none; position:fixed; inset:0; background:rgba(20,30,20,0.45);
+    align-items:center; justify-content:center; z-index:50; padding:16px; overflow-y:auto;}
+  .modal-bg.show{display:flex;}
+  .modal{background:#fff; border-radius:12px; padding:22px; max-width:380px; width:100%;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25); margin:auto;}
+  .modal h3{color:var(--leaf-dark); margin:0 0 10px; font-size:16px;}
+  .modal p{font-size:13px; color:var(--ink-soft); margin:0 0 10px; line-height:1.5;}
+  .modal input, .modal select{width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px;
+    font-family:inherit; font-size:14px; margin-bottom:10px;}
+  .modal-btns{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;}
+  .modal hr{border:none; border-top:1px solid var(--line); margin:16px 0;}
+  .section-title{font-weight:700; font-size:13px; color:var(--leaf-dark); margin-bottom:8px;}
+
+  table.admin-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+  table.admin-table th, table.admin-table td{border:1px solid var(--line); padding:6px 8px; text-align:left;}
+  table.admin-table th{background:#f2f8f3; color:var(--leaf-dark);}
+  table.admin-table input{width:100%; padding:5px 6px; border:1px solid var(--line); border-radius:5px; font-size:12px;}
+  .swap-tool{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:14px;}
+  .swap-tool select{padding:7px; border:1.5px solid var(--line); border-radius:7px; font-size:12.5px;}
+
+  footer{text-align:center; font-size:12px; color:var(--ink-soft); margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">Sơ đồ lớp 10A1</h1>
+  <p class="subtitle">Nhìn từ trên xuống · 12h: bảng lớp · 11h: cửa ra vào · 1h: bàn giáo viên · 6h: cuối lớp</p>
+
+  <div class="card">
+    <div class="guide">
+      🌱 <b>Cách dùng:</b> Chạm ô trống → nhập tên → tên hiện lên ngay cho mọi người thấy → sau đó đặt
+      <b>mật khẩu</b> để khóa chỗ lại (không ai giành được nữa). Muốn đổi chỗ với bạn khác, chạm vào ô của bạn đó
+      rồi nhập <b>tên + mật khẩu chỗ hiện tại của mình</b> để gửi yêu cầu. Bạn được mời đổi chỗ hãy chạm vào
+      <b>chính ô của mình</b>, nhập mật khẩu để xem và đồng ý/từ chối.
+    </div>
+
+    <div class="front-zone">
+      <div class="front-box door"><span class="icon">🚪</span>CỬA RA VÀO</div>
+      <div class="front-box podium"><span class="icon">🧑‍🏫</span>BỤC GIẢNG<div class="board">BẢNG LỚP</div></div>
+      <div class="front-box teacher-desk"><span class="icon">🗄️</span>BÀN GIÁO VIÊN</div>
+    </div>
+
+    <div class="classroom-grid" id="classroomGrid"></div>
+    <div class="back-label">— CUỐI LỚP —</div>
+
+    <div class="legend">
+      <span><i class="box" style="background:#fbfdfb;border:2px dashed #b9d4c0;"></i>Ô trống</span>
+      <span><i class="box" style="background:#fff8ec;border:2px solid var(--clay);"></i>Có tên, chưa khóa 🔓</span>
+      <span><i class="box" style="background:#eaf5ee;border:2px solid #a9c9b6;"></i>Đã khóa 🔒</span>
+      <span><i class="box" style="background:#fdecea;border:2px solid var(--red);"></i>Có yêu cầu đổi chỗ</span>
+    </div>
+    <div id="pageMsg" class="msg"></div>
+  </div>
+
+  <details class="card" id="adminDetails">
+    <summary style="font-weight:700; color:var(--leaf-dark); cursor:pointer;">🔒 Khu vực giáo viên / quản trị</summary>
+    <div id="adminLocked" style="margin-top:14px;">
+      <input type="text" id="adminPassInput" placeholder="Nhập mật khẩu quản trị" style="width:100%; max-width:280px; padding:9px 12px; border:1.5px solid var(--line); border-radius:8px;">
+      <button class="btn btn-primary btn-sm" id="adminUnlockBtn" style="margin-left:8px;">Mở khóa</button>
+      <div id="adminLoginErr" class="msg err"></div>
+    </div>
+    <div id="adminPanel" style="display:none; margin-top:14px;">
+      <div class="section-title">Danh sách chỗ ngồi đã đăng ký (xem &amp; sửa mật khẩu)</div>
+      <div style="overflow-x:auto;"><table class="admin-table" id="adminTable"></table></div>
+
+      <div class="section-title" style="margin-top:18px;">Đổi chỗ nhanh (bỏ qua mật khẩu)</div>
+      <div class="swap-tool">
+        <select id="swapA"></select>
+        <span>⇄</span>
+        <select id="swapB"></select>
+        <button class="btn btn-blue btn-sm" id="swapBtn">Đổi chỗ</button>
+      </div>
+
+      <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-clay btn-sm" id="exportWordBtn">📄 Xuất sơ đồ ra file Word</button>
+        <button class="btn btn-ghost btn-sm" id="resetAllBtn">🗑️ Xóa toàn bộ sơ đồ</button>
+      </div>
+      <div id="adminMsg" class="msg"></div>
+    </div>
+  </details>
+
+  <footer>Sạch hôm nay – Xanh ngày mai – Đẹp trường, đẹp lớp 💚</footer>
+</div>
+
+<!-- Modal chính: đăng ký / xem-sửa / đổi chỗ -->
+<div class="modal-bg" id="seatModal">
+  <div class="modal" id="seatModalBody"></div>
+</div>
+
+<!-- Modal admin xác nhận reset -->
+<div class="modal-bg" id="confirmResetModal">
+  <div class="modal">
+    <h3>Xác nhận xóa toàn bộ</h3>
+    <p>Toàn bộ tên, mật khẩu và yêu cầu đổi chỗ sẽ bị xóa. Không thể hoàn tác.</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" id="cancelResetBtn">Hủy</button>
+      <button class="btn btn-primary btn-sm" id="confirmResetBtn">Xóa toàn bộ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SEATS_KEY = "lop10a1-seats-v2";
+const SWAPS_KEY = "lop10a1-swaps-v2";
+const ADMIN_PASSWORD = "hoathuan2026";
+
+const LANES = [ {id:1, desks:7}, {id:2, desks:6}, {id:3, desks:6}, {id:4, desks:6} ];
+
+let seats = {};
+let swaps = [];
+let adminUnlocked = false;
+
+function allSeatIds(){
+  const ids = [];
+  LANES.forEach(l=>{ for(let b=1;b<=l.desks;b++){ ids.push(`d${l.id}-b${b}-T`); ids.push(`d${l.id}-b${b}-P`); } });
+  return ids;
+}
+function seatLabel(id){
+  const [d,b,s] = id.split('-');
+  return `Dãy ${d.slice(1)} — Bàn ${b.slice(1)} — ghế ${s==='T'?'trái':'phải'}`;
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+async function loadAll(){
+  try{ const r = await window.storage.get(SEATS_KEY, true); seats = r? JSON.parse(r.value) : {}; }
+  catch(e){ seats = {}; }
+  allSeatIds().forEach(id=>{ if(!(id in seats)) seats[id] = null; });
+  try{ const r = await window.storage.get(SWAPS_KEY, true); swaps = r? JSON.parse(r.value) : []; }
+  catch(e){ swaps = []; }
+}
+async function saveSeats(){ await window.storage.set(SEATS_KEY, JSON.stringify(seats), true); }
+async function saveSwaps(){ await window.storage.set(SWAPS_KEY, JSON.stringify(swaps), true); }
+
+function showMsg(el, text, type){ el.textContent = text; el.className = 'msg show ' + type; setTimeout(()=> el.classList.remove('show'), 3500); }
+
+function findSeatByCred(name, password){
+  name = (name||'').trim();
+  for(const id in seats){
+    const s = seats[id];
+    if(s && s.name.trim().toLowerCase() === name.toLowerCase() && (s.password||'') === (password||'')) return id;
+  }
+  return null;
+}
+
+/* -------------------- RENDER LƯỚI -------------------- */
+function render(){
+  const grid = document.getElementById('classroomGrid');
+  grid.innerHTML = '';
+  LANES.forEach(l=>{
+    const lane = document.createElement('div');
+    lane.className = 'lane';
+    lane.innerHTML = `<div class="lane-label">Dãy ${l.id}</div>`;
+    for(let b=1;b<=l.desks;b++){
+      const desk = document.createElement('div'); desk.className = 'desk';
+      ['T','P'].forEach(side=>{
+        const id = `d${l.id}-b${b}-${side}`;
+        const data = seats[id];
+        const div = document.createElement('div');
+        div.className = 'seat';
+        const hasPending = swaps.some(s => s.status==='pending' && (s.fromSeatId===id || s.toSeatId===id));
+        if(data){
+          div.classList.add('taken');
+          if(!data.password) div.classList.add('unlocked');
+          if(hasPending) div.classList.add('pending');
+          const icon = data.password ? '🔒' : '🔓';
+          div.innerHTML = `${escapeHtml(data.name.split(' ').slice(-1)[0])}<span class="lockicon">${hasPending?'🔔':icon}</span>`;
+        } else {
+          div.textContent = '+';
+        }
+        div.title = seatLabel(id) + (data ? (' — ' + data.name) : ' — Trống');
+        div.onclick = () => onSeatClick(id);
+        desk.appendChild(div);
+      });
+      lane.appendChild(desk);
+    }
+    grid.appendChild(lane);
+  });
+}
+
+/* -------------------- MODAL HELPERS -------------------- */
+function openModal(html){
+  document.getElementById('seatModalBody').innerHTML = html;
+  document.getElementById('seatModal').classList.add('show');
+}
+function closeModal(){ document.getElementById('seatModal').classList.remove('show'); }
+
+/* -------------------- CLICK VÀO Ô -------------------- */
+async function onSeatClick(seatId){
+  await loadAll();
+  const data = seats[seatId];
+
+  if(!data){
+    openModal(`
+      <h3>Đăng ký chỗ ngồi</h3>
+      <p>${seatLabel(seatId)}</p>
+      <input type="text" id="mName" placeholder="Nhập họ và tên của em">
+      <div id="mErr" class="msg err"></div>
+      <div class="modal-btns">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal()">Hủy</button>
+        <button class="btn btn-primary btn-sm" id="mNext">Tiếp tục</button>
+      </div>`);
+    document.getElementById('mNext').onclick = async ()=>{
+      const name = document.getElementById('mName').value.trim();
+      if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
+      await loadAll();
+      if(seats[seatId]){ showMsg(document.getElementById('mErr'), 'Rất tiếc, ô này vừa có bạn khác đăng ký trước.', 'err'); render(); closeModal(); return; }
+      seats[seatId] = {name, password:''};
+      await saveSeats();
+      render();
+      openLockStep(seatId, name);
+    };
+    return;
+  }
+
+  // Ô đã có người
+  if(!data.password){
+    openUnlockedEditModal(seatId, data);
+  } else {
+    openLockedSeatModal(seatId, data);
+  }
+}
+
+function openLockStep(seatId, name){
+  openModal(`
+    <h3>Đặt mật khẩu khóa chỗ</h3>
+    <p>Tên <b>${escapeHtml(name)}</b> đã hiện trên sơ đồ. Đặt mật khẩu để không ai giành/sửa được chỗ này.</p>
+    <input type="password" id="mPass" placeholder="Đặt mật khẩu (VD: 4-6 ký tự)">
+    <div id="mErr" class="msg err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Để sau</button>
+      <button class="btn btn-primary btn-sm" id="mLock">Khóa lại</button>
+    </div>`);
+  document.getElementById('mLock').onclick = async ()=>{
+    const pass = document.getElementById('mPass').value;
+    if(!pass){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập mật khẩu.', 'err'); return; }
+    await loadAll();
+    if(!seats[seatId] || seats[seatId].name !== name){ closeModal(); render(); return; }
+    seats[seatId].password = pass;
+    await saveSeats();
+    render();
+    closeModal();
+  };
+}
+
+function openUnlockedEditModal(seatId, data){
+  openModal(`
+    <h3>${seatLabel(seatId)}</h3>
+    <p>Tên hiện tại: <b>${escapeHtml(data.name)}</b> — chưa khóa mật khẩu, ai cũng sửa được.</p>
+    <input type="text" id="mName" value="${escapeHtml(data.name)}" placeholder="Họ tên">
+    <input type="password" id="mPass" placeholder="Đặt mật khẩu để khóa chỗ này">
+    <div id="mErr" class="msg err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" id="mClear">Bỏ trống chỗ</button>
+      <button class="btn btn-primary btn-sm" id="mSave">Lưu &amp; khóa</button>
+    </div>`);
+  document.getElementById('mSave').onclick = async ()=>{
+    const name = document.getElementById('mName').value.trim();
+    const pass = document.getElementById('mPass').value;
+    if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
+    await loadAll();
+    seats[seatId] = {name, password:pass};
+    await saveSeats(); render(); closeModal();
+  };
+  document.getElementById('mClear').onclick = async ()=>{
+    await loadAll();
+    seats[seatId] = null;
+    swaps = swaps.filter(s=> s.fromSeatId!==seatId && s.toSeatId!==seatId);
+    await saveSeats(); await saveSwaps(); render(); closeModal();
+  };
+}
+
+function openLockedSeatModal(seatId, data){
+  const myOutgoing = swaps.find(s=> s.status==='pending' && s.fromSeatId===seatId);
+  const myIncoming = swaps.filter(s=> s.status==='pending' && s.toSeatId===seatId);
+
+  openModal(`
+    <h3>${seatLabel(seatId)}</h3>
+    <p>Đang có: <b>${escapeHtml(data.name)}</b> 🔒</p>
+
+    <div class="section-title">Nếu đây là chỗ của bạn</div>
+    <input type="password" id="ownPass" placeholder="Nhập mật khẩu để mở khóa">
+    <div id="ownErr" class="msg err"></div>
+    <button class="btn btn-primary btn-sm" id="ownUnlockBtn">Mở khóa</button>
+    <div id="ownArea" style="margin-top:10px;"></div>
+
+    <hr>
+    <div class="section-title">Muốn đổi chỗ tới đây?</div>
+    <p>Nhập tên và mật khẩu chỗ hiện tại của bạn để gửi yêu cầu đổi chỗ.</p>
+    <input type="text" id="reqName" placeholder="Họ tên của bạn">
+    <input type="password" id="reqPass" placeholder="Mật khẩu chỗ hiện tại của bạn">
+    <div id="reqErr" class="msg err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Đóng</button>
+      <button class="btn btn-blue btn-sm" id="reqBtn">Gửi yêu cầu đổi chỗ</button>
+    </div>`);
+
+  document.getElementById('ownUnlockBtn').onclick = ()=>{
+    const p = document.getElementById('ownPass').value;
+    if(p !== data.password){ showMsg(document.getElementById('ownErr'), 'Sai mật khẩu.', 'err'); return; }
+    let html = `
+      <input type="text" id="ownName" value="${escapeHtml(data.name)}" placeholder="Họ tên">
+      <input type="text" id="ownNewPass" value="${escapeHtml(data.password)}" placeholder="Mật khẩu mới">
+      <div class="modal-btns">
+        <button class="btn btn-ghost btn-sm" id="ownClearBtn">Bỏ trống chỗ</button>
+        <button class="btn btn-primary btn-sm" id="ownSaveBtn">Lưu thay đổi</button>
+      </div>`;
+    if(myOutgoing){
+      html += `<div class="msg info show" style="margin-top:10px;">⏳ Bạn đã gửi yêu cầu đổi chỗ tới <b>${escapeHtml(myOutgoing.toName)}</b>.
+        <br><button class="btn btn-ghost btn-sm" id="cancelOutBtn" style="margin-top:6px;">Hủy yêu cầu</button></div>`;
+    }
+    myIncoming.forEach(r=>{
+      html += `<div class="msg info show" style="margin-top:10px;">🔁 <b>${escapeHtml(r.fromName)}</b> muốn đổi chỗ với bạn.
+        <div class="modal-btns" style="margin-top:8px;">
+          <button class="btn btn-ghost btn-sm" data-decline="${r.id}">Từ chối</button>
+          <button class="btn btn-primary btn-sm" data-accept="${r.id}">Đồng ý</button>
+        </div></div>`;
+    });
+    document.getElementById('ownArea').innerHTML = html;
+
+    document.getElementById('ownSaveBtn').onclick = async ()=>{
+      const newName = document.getElementById('ownName').value.trim();
+      const newPass = document.getElementById('ownNewPass').value;
+      if(!newName) return;
+      await loadAll();
+      seats[seatId] = {name:newName, password:newPass};
+      await saveSeats(); render(); closeModal();
+    };
+    document.getElementById('ownClearBtn').onclick = async ()=>{
+      await loadAll();
+      seats[seatId] = null;
+      swaps = swaps.filter(s=> s.fromSeatId!==seatId && s.toSeatId!==seatId);
+      await saveSeats(); await saveSwaps(); render(); closeModal();
+    };
+    const cancelBtn = document.getElementById('cancelOutBtn');
+    if(cancelBtn) cancelBtn.onclick = async ()=>{
+      await loadAll();
+      swaps = swaps.filter(s=> s.id !== myOutgoing.id);
+      await saveSwaps(); render(); closeModal();
+    };
+    document.querySelectorAll('[data-accept]').forEach(b=> b.onclick = ()=> respondSwap(b.getAttribute('data-accept'), true));
+    document.querySelectorAll('[data-decline]').forEach(b=> b.onclick = ()=> respondSwap(b.getAttribute('data-decline'), false));
+  };
+
+  document.getElementById('reqBtn').onclick = async ()=>{
+    const rn = document.getElementById('reqName').value.trim();
+    const rp = document.getElementById('reqPass').value;
+    await loadAll();
+    const fromSeatId = findSeatByCred(rn, rp);
+    if(!fromSeatId){ showMsg(document.getElementById('reqErr'), 'Không tìm thấy chỗ ngồi khớp với tên/mật khẩu này.', 'err'); return; }
+    if(fromSeatId === seatId){ showMsg(document.getElementById('reqErr'), 'Đây đã là chỗ của bạn rồi.', 'err'); return; }
+    if(swaps.some(s=> s.status==='pending' && s.fromSeatId===fromSeatId)){
+      showMsg(document.getElementById('reqErr'), 'Bạn đã có 1 yêu cầu đổi chỗ đang chờ, không thể gửi thêm.', 'err'); return;
+    }
+    swaps.push({ id:'sw_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      fromSeatId, fromName: seats[fromSeatId].name, toSeatId: seatId, toName: data.name, status:'pending' });
+    await saveSwaps();
+    showMsg(document.getElementById('pageMsg'), `Đã gửi yêu cầu đổi chỗ tới ${data.name}. Bạn ấy cần chạm vào chỗ của mình để đồng ý.`, 'ok');
+    render(); closeModal();
+  };
+}
+
+async function respondSwap(swapId, accept){
+  await loadAll();
+  const sw = swaps.find(s=>s.id===swapId);
+  if(!sw || sw.status!=='pending'){ render(); closeModal(); return; }
+  if(accept){
+    const a = seats[sw.fromSeatId], b = seats[sw.toSeatId];
+    if(a && b){ seats[sw.fromSeatId] = b; seats[sw.toSeatId] = a; await saveSeats(); }
+  }
+  swaps = swaps.filter(s=> s.id !== swapId);
+  await saveSwaps();
+  render(); closeModal();
+}
+
+/* -------------------- ADMIN -------------------- */
+document.getElementById('adminUnlockBtn').onclick = async ()=>{
+  const pass = document.getElementById('adminPassInput').value;
+  if(pass !== ADMIN_PASSWORD){
+    showMsg(document.getElementById('adminLoginErr'), 'Sai mật khẩu quản trị.', 'err'); return;
+  }
+  adminUnlocked = true;
+  document.getElementById('adminLocked').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  await loadAll();
+  renderAdmin();
+};
+
+function renderAdmin(){
+  const tbl = document.getElementById('adminTable');
+  let rows = `<tr><th>Vị trí</th><th>Họ tên</th><th>Mật khẩu</th><th></th></tr>`;
+  const occupied = allSeatIds().filter(id=> seats[id]);
+  occupied.sort((a,b)=> a.localeCompare(b));
+  occupied.forEach(id=>{
+    const d = seats[id];
+    rows += `<tr>
+      <td>${seatLabel(id)}</td>
+      <td><input type="text" id="an-${id}" value="${escapeHtml(d.name)}"></td>
+      <td><input type="text" id="ap-${id}" value="${escapeHtml(d.password||'')}"></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-primary btn-sm" data-save="${id}">Lưu</button>
+        <button class="btn btn-ghost btn-sm" data-clear="${id}">Xóa</button>
+      </td></tr>`;
+  });
+  if(!occupied.length) rows += `<tr><td colspan="4" style="text-align:center;color:var(--ink-soft);">Chưa có ai đăng ký.</td></tr>`;
+  tbl.innerHTML = rows;
+
+  document.querySelectorAll('[data-save]').forEach(b=> b.onclick = async ()=>{
+    const id = b.getAttribute('data-save');
+    const name = document.getElementById(`an-${id}`).value.trim();
+    const pass = document.getElementById(`ap-${id}`).value;
+    if(!name) return;
+    await loadAll();
+    seats[id] = {name, password:pass};
+    await saveSeats();
+    render(); renderAdmin();
+    showMsg(document.getElementById('adminMsg'), 'Đã lưu.', 'ok');
+  });
+  document.querySelectorAll('[data-clear]').forEach(b=> b.onclick = async ()=>{
+    const id = b.getAttribute('data-clear');
+    await loadAll();
+    seats[id] = null;
+    swaps = swaps.filter(s=> s.fromSeatId!==id && s.toSeatId!==id);
+    await saveSeats(); await saveSwaps();
+    render(); renderAdmin();
+  });
+
+  const selA = document.getElementById('swapA'), selB = document.getElementById('swapB');
+  const opts = allSeatIds().map(id=> `<option value="${id}">${seatLabel(id)}${seats[id]? ' — '+escapeHtml(seats[id].name):' (trống)'}</option>`).join('');
+  selA.innerHTML = opts; selB.innerHTML = opts;
+}
+
+document.getElementById('swapBtn').onclick = async ()=>{
+  const a = document.getElementById('swapA').value, b = document.getElementById('swapB').value;
+  if(a === b) return;
+  await loadAll();
+  const tmp = seats[a]; seats[a] = seats[b]; seats[b] = tmp;
+  swaps = swaps.filter(s=> ![a,b].includes(s.fromSeatId) && ![a,b].includes(s.toSeatId));
+  await saveSeats(); await saveSwaps();
+  render(); renderAdmin();
+  showMsg(document.getElementById('adminMsg'), 'Đã đổi chỗ.', 'ok');
+};
+
+document.getElementById('resetAllBtn').onclick = ()=> document.getElementById('confirmResetModal').classList.add('show');
+document.getElementById('cancelResetBtn').onclick = ()=> document.getElementById('confirmResetModal').classList.remove('show');
+document.getElementById('confirmResetBtn').onclick = async ()=>{
+  seats = {}; allSeatIds().forEach(id=> seats[id]=null);
+  swaps = [];
+  await saveSeats(); await saveSwaps();
+  document.getElementById('confirmResetModal').classList.remove('show');
+  render(); renderAdmin();
+  showMsg(document.getElementById('adminMsg'), 'Đã xóa toàn bộ sơ đồ.', 'ok');
+};
+
+document.getElementById('exportWordBtn').onclick = async ()=>{
+  await loadAll();
+  const maxB = Math.max(...LANES.map(l=>l.desks));
+  let table = `<table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;">
+    <tr>${LANES.map(l=>`<th style="background:#eaf5ee;">Dãy ${l.id}</th>`).join('')}</tr>`;
+  for(let b=1;b<=maxB;b++){
+    table += '<tr>';
+    LANES.forEach(l=>{
+      if(b > l.desks){ table += '<td></td>'; return; }
+      const t = seats[`d${l.id}-b${b}-T`], p = seats[`d${l.id}-b${b}-P`];
+      table += `<td style="text-align:center;">Bàn ${b}<br>${t? escapeHtml(t.name):'(trống)'} — ${p? escapeHtml(p.name):'(trống)'}</td>`;
+    });
+    table += '</tr>';
+  }
+  table += '</table>';
+
+  const doc = `
+  <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+  <head><meta charset="utf-8"><title>Sơ đồ lớp 10A1</title></head>
+  <body style="font-family:Arial;">
+    <h2 style="text-align:center;">SƠ ĐỒ LỚP 10A1</h2>
+    <p style="text-align:center;">CỬA RA VÀO (trái) — BẢNG LỚP / BỤC GIẢNG (giữa) — BÀN GIÁO VIÊN (phải)</p>
+    ${table}
+    <p style="text-align:center;margin-top:10px;">— CUỐI LỚP —</p>
+  </body></html>`;
+
+  const blob = new Blob(['\ufeff', doc], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'so-do-lop-10a1.doc';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+async function refresh(){ await loadAll(); render(); if(adminUnlocked) renderAdmin(); }
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>
