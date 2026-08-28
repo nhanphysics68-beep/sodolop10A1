@@ -171,6 +171,9 @@
       <div class="section-title">Danh sách chỗ ngồi đã đăng ký (xem &amp; sửa mật khẩu)</div>
       <div style="overflow-x:auto;"><table class="admin-table" id="adminTable"></table></div>
 
+      <div class="section-title" id="rosterTitle" style="margin-top:18px;">Đối chiếu danh sách lớp</div>
+      <div style="overflow-x:auto;"><table class="admin-table" id="rosterTable"></table></div>
+
       <div class="section-title" style="margin-top:18px;">Đổi chỗ nhanh (bỏ qua mật khẩu)</div>
       <div class="swap-tool">
         <select id="swapA"></select>
@@ -227,6 +230,55 @@ const swapsRef = db.ref('lop10a1/swaps');
 const ADMIN_PASSWORD = "hoathuan2026";
 
 const LANES = [ {id:1, desks:7}, {id:2, desks:6}, {id:3, desks:6}, {id:4, desks:6} ];
+
+// Danh sách cả lớp để đối chiếu ai chưa có chỗ ngồi
+const CLASS_ROSTER = [
+  {name:"Danh Huy Trí", dob:"14/01/2011", gender:"Nam", ethnic:"Khơ-me"},
+  {name:"Lưu Phát Lộc", dob:"02/04/2011", gender:"Nam", ethnic:"Khơ-me"},
+  {name:"Đỗ Thị Quỳnh Như", dob:"03/07/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Đỗ Viết Lâm", dob:"19/06/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Nguyễn Hoàng Hiệp", dob:"18/09/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Châu Thị Diễm Ngọc", dob:"24/03/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Lưu Ngọc Huyền Trân", dob:"16/05/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Nguyễn Phú Cường", dob:"18/03/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Võ Thị Diễm Trinh", dob:"19/05/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Bùi Thị Thúy Ngân", dob:"18/03/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Hồ Anh Thơ", dob:"29/06/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Hồ Trương Hoàng Long", dob:"03/07/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Hoàng Ngọc Thảo Vy", dob:"01/10/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Nguyễn Hữu Cảnh", dob:"20/01/2011", gender:"Nam", ethnic:"Khơ-me"},
+  {name:"Nguyễn Hữu Lộc", dob:"30/11/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Nguyễn Trọng Thiện", dob:"27/10/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Danh Thanh Thương", dob:"23/04/2011", gender:"Nam", ethnic:"Khơ-me"},
+  {name:"Dư Thị Diễm Duy", dob:"29/06/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Lâm Pha Lê", dob:"09/09/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Lê Trần Khánh Duy", dob:"24/11/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Nguyễn Hữu Nghĩa", dob:"30/09/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Danh Thị Bảo Trân", dob:"11/10/2011", gender:"Nữ", ethnic:"Khơ-me"},
+  {name:"Hồ Phương Lam", dob:"14/07/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Huỳnh Ngọc Diệp", dob:"15/11/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Lê Nhựt Linh", dob:"31/07/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Lê Thị Cẩm Tú", dob:"06/09/2011", gender:"Nữ", ethnic:"Khơ-me"},
+  {name:"Trần Gia Bảo", dob:"12/01/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Đặng Gia Hưng", dob:"02/08/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Lâm Gia An", dob:"03/05/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Nguyễn Hoàng Vinh", dob:"17/03/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Trần Chí Trung", dob:"12/12/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Hà Tuyết Nhi", dob:"18/01/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Huỳnh Ngọc Yến", dob:"03/07/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Huỳnh Nguyễn Bảo Như", dob:"07/05/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Nguyễn Hồng Phi", dob:"20/11/2011", gender:"Nam", ethnic:"Khơ-me"},
+  {name:"Nguyễn Quốc Duy", dob:"23/06/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Phù Kim Hên", dob:"27/10/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Trần Đặng Ngọc Lam", dob:"28/01/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Trịnh Tiền Trân", dob:"21/01/2011", gender:"Nữ", ethnic:"Kinh"},
+  {name:"Danh Trung Kiên", dob:"05/10/2011", gender:"Nam", ethnic:"Khơ-me"},
+  {name:"Huỳnh Thiện Nhân", dob:"01/12/2010", gender:"Nam", ethnic:"Kinh"},
+  {name:"Lê Anh Khôi", dob:"06/07/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Trương Quốc Bảo", dob:"24/01/2011", gender:"Nam", ethnic:"Kinh"},
+  {name:"Danh Gia Bảo", dob:"24/09/2011", gender:"Nam", ethnic:"Khơ-me"},
+  {name:"Nguyễn Thị Hồng Tím", dob:"23/06/2011", gender:"Nữ", ethnic:"Kinh"},
+];
 
 let seats = {};
 let swaps = [];
@@ -534,14 +586,25 @@ document.getElementById('adminUnlockBtn').onclick = async ()=>{
   renderAdmin();
 };
 
+function normalizeName(s){ return (s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+
+function findSeatIdByName(name){
+  const target = normalizeName(name);
+  for(const id in seats){
+    if(seats[id] && normalizeName(seats[id].name) === target) return id;
+  }
+  return null;
+}
+
 function renderAdmin(){
   const tbl = document.getElementById('adminTable');
-  let rows = `<tr><th>Vị trí</th><th>Họ tên</th><th>Mật khẩu</th><th></th></tr>`;
+  let rows = `<tr><th>STT</th><th>Vị trí</th><th>Họ tên</th><th>Mật khẩu</th><th></th></tr>`;
   const occupied = allSeatIds().filter(id=> seats[id]);
   occupied.sort((a,b)=> a.localeCompare(b));
-  occupied.forEach(id=>{
+  occupied.forEach((id,idx)=>{
     const d = seats[id];
     rows += `<tr>
+      <td>${idx+1}</td>
       <td>${seatLabel(id)}</td>
       <td><input type="text" id="an-${id}" value="${escapeHtml(d.name)}"></td>
       <td><input type="text" id="ap-${id}" value="${escapeHtml(d.password||'')}"></td>
@@ -550,8 +613,26 @@ function renderAdmin(){
         <button class="btn btn-ghost btn-sm" data-clear="${id}">Xóa</button>
       </td></tr>`;
   });
-  if(!occupied.length) rows += `<tr><td colspan="4" style="text-align:center;color:var(--ink-soft);">Chưa có ai đăng ký.</td></tr>`;
+  if(!occupied.length) rows += `<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);">Chưa có ai đăng ký.</td></tr>`;
   tbl.innerHTML = rows;
+
+  // Bảng đối chiếu danh sách cả lớp — chỉ liệt kê các bạn CHƯA chọn chỗ
+  const rosterTbl = document.getElementById('rosterTable');
+  const missing = CLASS_ROSTER.filter(st=> !findSeatIdByName(st.name));
+  const registeredCount = CLASS_ROSTER.length - missing.length;
+  document.getElementById('rosterTitle').textContent =
+    `Các bạn chưa chọn chỗ (${registeredCount}/${CLASS_ROSTER.length} đã có chỗ)`;
+  let rrows = `<tr><th>STT</th><th>Họ tên</th><th>Ngày sinh</th><th>Giới tính</th><th>Dân tộc</th></tr>`;
+  if(!missing.length){
+    rrows += `<tr><td colspan="5" style="text-align:center;color:var(--leaf-dark);font-weight:700;">🎉 Tất cả học sinh đã chọn chỗ!</td></tr>`;
+  } else {
+    missing.forEach((st, idx)=>{
+      rrows += `<tr style="background:#fdecea;">
+        <td>${idx+1}</td><td>${escapeHtml(st.name)}</td><td>${st.dob}</td><td>${st.gender}</td><td>${st.ethnic}</td>
+      </tr>`;
+    });
+  }
+  rosterTbl.innerHTML = rrows;
 
   document.querySelectorAll('[data-save]').forEach(b=> b.onclick = async ()=>{
     const id = b.getAttribute('data-save');
