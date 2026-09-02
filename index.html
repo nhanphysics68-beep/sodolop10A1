@@ -21,14 +21,10 @@
   @media (max-width:640px){ .wrap{padding-left:10px; padding-right:10px;} .card{padding:14px;} }
 
   .page-header{display:flex; align-items:center; gap:18px; margin-bottom:4px;}
-  .page-logo{width:110px; height:auto; flex:none;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));}
+  .page-logo{width:110px; height:auto; flex:none; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15));}
   .logo-spacer{width:110px; flex:none;}
   .header-text{flex:1; min-width:0;}
-  @media (max-width:640px){
-    .page-header{gap:10px;}
-    .page-logo, .logo-spacer{width:64px;}
-  }
+  @media (max-width:640px){ .page-header{gap:10px;} .page-logo,.logo-spacer{width:64px;} }
 
   h1.title{text-align:center; color:var(--leaf-dark); font-size:clamp(22px,4vw,32px);
     letter-spacing:1px; margin:4px 0 4px; text-transform:uppercase; font-weight:800;}
@@ -36,8 +32,6 @@
 
   .card{background:var(--paper); border:1px solid var(--line); border-radius:14px;
         box-shadow:var(--shadow); padding:20px; margin-bottom:20px;}
-  .card h2{font-size:15px; color:#fff; background:var(--leaf); display:inline-block;
-        padding:5px 14px; border-radius:8px; margin:0 0 14px;}
 
   .guide{background:#f7fbf8; border:1.5px dashed var(--line); border-radius:10px;
     padding:12px 16px; font-size:13px; color:var(--ink-soft); margin-bottom:18px; line-height:1.7;}
@@ -73,7 +67,7 @@
   .seat-name{display:block; word-break:break-word; max-width:100%;}
   .seat:hover{transform:translateY(-2px); box-shadow:0 3px 8px rgba(0,0,0,0.12);}
   .seat.taken{border-style:solid; border-color:#a9c9b6; background:#eaf5ee; color:var(--leaf-dark);}
-  .seat.unlocked{border-color:var(--clay); background:#fff8ec;}
+  .seat.mine{border-color:var(--clay); background:#fff8ec; box-shadow:0 0 0 2px #fde3bd inset;}
   .seat.pending{border-color:var(--red);}
   .seat .lockicon{position:absolute; top:-6px; right:-6px; font-size:clamp(8px,1.8vw,16px); background:#fff; border-radius:50%; padding:1px;}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,57,43,0.4);}70%{box-shadow:0 0 0 8px rgba(192,57,43,0);}100%{box-shadow:0 0 0 0 rgba(192,57,43,0);}}
@@ -94,6 +88,7 @@
   .btn-sm{padding:6px 12px; font-size:12px; border-radius:7px;}
   .btn-blue{background:var(--blue); color:#fff;}
   .btn-clay{background:var(--clay); color:#fff;}
+  .btn:disabled{opacity:.55; cursor:not-allowed;}
 
   .msg{font-size:13px; padding:9px 12px; border-radius:8px; margin-top:10px; display:none;}
   .msg.show{display:block;}
@@ -121,6 +116,10 @@
   .swap-tool{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:14px;}
   .swap-tool select{padding:7px; border:1.5px solid var(--line); border-radius:7px; font-size:12.5px;}
 
+  .admin-login{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .admin-login input{padding:9px 12px; border:1.5px solid var(--line); border-radius:8px;
+    font-family:inherit; font-size:14px; min-width:220px;}
+
   footer{text-align:center; font-size:12px; color:var(--ink-soft); margin-top:6px;}
 </style>
 </head>
@@ -137,10 +136,12 @@
 
   <div class="card">
     <div class="guide">
-      🌱 <b>Cách dùng:</b> Chạm ô trống → nhập tên → tên hiện lên ngay cho mọi người thấy → sau đó đặt
-      <b>mật khẩu</b> để khóa chỗ lại (không ai giành được nữa). Muốn đổi chỗ với bạn khác, chạm vào ô của bạn đó
-      rồi nhập <b>tên + mật khẩu chỗ hiện tại của mình</b> để gửi yêu cầu. Bạn được mời đổi chỗ hãy chạm vào
-      <b>chính ô của mình</b>, nhập mật khẩu để xem và đồng ý/từ chối.
+      🌱 <b>Cách dùng:</b> Chạm vào ô trống → nhập tên → xong. Chỗ đó tự động thuộc về em,
+      <b>không cần đặt mật khẩu</b>. Ô của em viền cam, chỉ mình em sửa được; ô của bạn khác em không đụng vào được.
+      Muốn đổi chỗ, chạm vào ô của bạn đó rồi bấm <b>Gửi yêu cầu đổi chỗ</b> — thầy sẽ duyệt.
+      <br>
+      ⚠ Máy tính hoặc điện thoại em dùng để đăng ký chính là <b>chìa khóa</b> của chỗ ngồi.
+      Nếu đổi máy hoặc xóa dữ liệu trình duyệt thì báo thầy xóa ô giúp rồi đăng ký lại.
     </div>
 
     <div class="front-zone">
@@ -154,8 +155,8 @@
 
     <div class="legend">
       <span><i class="box" style="background:#fbfdfb;border:2px dashed #b9d4c0;"></i>Ô trống</span>
-      <span><i class="box" style="background:#fff8ec;border:2px solid var(--clay);"></i>Có tên, chưa khóa 🔓</span>
-      <span><i class="box" style="background:#eaf5ee;border:2px solid #a9c9b6;"></i>Đã khóa 🔒</span>
+      <span><i class="box" style="background:#fff8ec;border:2px solid var(--clay);"></i>Chỗ của em ✋</span>
+      <span><i class="box" style="background:#eaf5ee;border:2px solid #a9c9b6;"></i>Chỗ của bạn khác</span>
       <span><i class="box" style="background:#fdecea;border:2px solid var(--red);"></i>Có yêu cầu đổi chỗ</span>
     </div>
     <div id="pageMsg" class="msg"></div>
@@ -163,19 +164,35 @@
 
   <details class="card" id="adminDetails">
     <summary style="font-weight:700; color:var(--leaf-dark); cursor:pointer;">🔒 Khu vực giáo viên / quản trị</summary>
+
     <div id="adminLocked" style="margin-top:14px;">
-      <input type="text" id="adminPassInput" placeholder="Nhập mật khẩu quản trị" style="width:100%; max-width:280px; padding:9px 12px; border:1.5px solid var(--line); border-radius:8px;">
-      <button class="btn btn-primary btn-sm" id="adminUnlockBtn" style="margin-left:8px;">Mở khóa</button>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 10px;">
+        Đăng nhập bằng tài khoản giáo viên đã tạo trong Firebase Authentication.
+      </p>
+      <div class="admin-login">
+        <input type="email" id="adminEmailInput" placeholder="Email giáo viên" autocomplete="username">
+        <input type="password" id="adminPassInput" placeholder="Mật khẩu" autocomplete="current-password">
+        <button class="btn btn-primary btn-sm" id="adminUnlockBtn">Đăng nhập</button>
+      </div>
       <div id="adminLoginErr" class="msg err"></div>
     </div>
+
     <div id="adminPanel" style="display:none; margin-top:14px;">
-      <div class="section-title">Danh sách chỗ ngồi đã đăng ký (xem &amp; sửa mật khẩu)</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+        <span class="msg info show" style="margin:0;" id="adminWho"></span>
+        <button class="btn btn-ghost btn-sm" id="adminSignOutBtn">Đăng xuất</button>
+      </div>
+
+      <div class="section-title">Yêu cầu đổi chỗ đang chờ duyệt</div>
+      <div style="overflow-x:auto;"><table class="admin-table" id="swapApproveTable"></table></div>
+
+      <div class="section-title" style="margin-top:18px;">Danh sách chỗ ngồi đã đăng ký</div>
       <div style="overflow-x:auto;"><table class="admin-table" id="adminTable"></table></div>
 
       <div class="section-title" id="rosterTitle" style="margin-top:18px;">Đối chiếu danh sách lớp</div>
       <div style="overflow-x:auto;"><table class="admin-table" id="rosterTable"></table></div>
 
-      <div class="section-title" style="margin-top:18px;">Đổi chỗ nhanh (bỏ qua mật khẩu)</div>
+      <div class="section-title" style="margin-top:18px;">Đổi chỗ nhanh</div>
       <div class="swap-tool">
         <select id="swapA"></select>
         <span>⇄</span>
@@ -194,16 +211,12 @@
   <footer>Sạch hôm nay – Xanh ngày mai – Đẹp trường, đẹp lớp 💚</footer>
 </div>
 
-<!-- Modal chính: đăng ký / xem-sửa / đổi chỗ -->
-<div class="modal-bg" id="seatModal">
-  <div class="modal" id="seatModalBody"></div>
-</div>
+<div class="modal-bg" id="seatModal"><div class="modal" id="seatModalBody"></div></div>
 
-<!-- Modal admin xác nhận reset -->
 <div class="modal-bg" id="confirmResetModal">
   <div class="modal">
     <h3>Xác nhận xóa toàn bộ</h3>
-    <p>Toàn bộ tên, mật khẩu và yêu cầu đổi chỗ sẽ bị xóa. Không thể hoàn tác.</p>
+    <p>Toàn bộ tên và yêu cầu đổi chỗ sẽ bị xóa. Không thể hoàn tác.</p>
     <div class="modal-btns">
       <button class="btn btn-ghost btn-sm" id="cancelResetBtn">Hủy</button>
       <button class="btn btn-primary btn-sm" id="confirmResetBtn">Xóa toàn bộ</button>
@@ -213,7 +226,16 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
+/* =========================================================
+   SƠ ĐỒ LỚP 10A1
+   Quyền sở hữu chỗ ngồi dựa trên Firebase Anonymous Auth:
+   mỗi trình duyệt có một UID riêng, ô ghế ghi nhớ UID đó,
+   Security Rules chỉ cho phép chính chủ (hoặc giáo viên) sửa.
+   Không lưu mật khẩu học sinh ở bất kỳ đâu.
+   ========================================================= */
+
 const firebaseConfig = {
   apiKey: "AIzaSyA-SI1MkDOCCEFSyvUU2McqtZGSd5CEbkw",
   authDomain: "sodolop10a1.firebaseapp.com",
@@ -225,66 +247,26 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const seatsRef = db.ref('lop10a1/seats');
-const swapsRef = db.ref('lop10a1/swaps');
+const auth = firebase.auth();
 
-const ADMIN_PASSWORD = "hoathuan2026";
+/* UID tài khoản giáo viên. Không phải bí mật — chỉ dùng để so khớp,
+   mật khẩu thật nằm trong Firebase Authentication. */
+const ADMIN_UID = "3eMkknzDuNVFyrpmB1ceIBViTDD2";
+
+const ROOT       = 'lop10a1';
+const seatsRef   = db.ref(`${ROOT}/seats`);
+const swapsRef   = db.ref(`${ROOT}/swaps`);
+const rosterRef  = db.ref(`${ROOT}/roster`);   // chỉ giáo viên đọc được
 
 const LANES = [ {id:1, desks:7}, {id:2, desks:6}, {id:3, desks:6}, {id:4, desks:6} ];
 
-// Danh sách cả lớp để đối chiếu ai chưa có chỗ ngồi
-const CLASS_ROSTER = [
-  {name:"Danh Huy Trí", dob:"14/01/2011", gender:"Nam", ethnic:"Khơ-me"},
-  {name:"Lưu Phát Lộc", dob:"02/04/2011", gender:"Nam", ethnic:"Khơ-me"},
-  {name:"Đỗ Thị Quỳnh Như", dob:"03/07/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Đỗ Viết Lâm", dob:"19/06/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Nguyễn Hoàng Hiệp", dob:"18/09/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Châu Thị Diễm Ngọc", dob:"24/03/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Lưu Ngọc Huyền Trân", dob:"16/05/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Nguyễn Phú Cường", dob:"18/03/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Võ Thị Diễm Trinh", dob:"19/05/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Bùi Thị Thúy Ngân", dob:"18/03/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Hồ Anh Thơ", dob:"29/06/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Hồ Trương Hoàng Long", dob:"03/07/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Hoàng Ngọc Thảo Vy", dob:"01/10/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Nguyễn Hữu Cảnh", dob:"20/01/2011", gender:"Nam", ethnic:"Khơ-me"},
-  {name:"Nguyễn Hữu Lộc", dob:"30/11/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Nguyễn Trọng Thiện", dob:"27/10/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Danh Thanh Thương", dob:"23/04/2011", gender:"Nam", ethnic:"Khơ-me"},
-  {name:"Dư Thị Diễm Duy", dob:"29/06/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Lâm Pha Lê", dob:"09/09/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Lê Trần Khánh Duy", dob:"24/11/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Nguyễn Hữu Nghĩa", dob:"30/09/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Danh Thị Bảo Trân", dob:"11/10/2011", gender:"Nữ", ethnic:"Khơ-me"},
-  {name:"Hồ Phương Lam", dob:"14/07/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Huỳnh Ngọc Diệp", dob:"15/11/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Lê Nhựt Linh", dob:"31/07/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Lê Thị Cẩm Tú", dob:"06/09/2011", gender:"Nữ", ethnic:"Khơ-me"},
-  {name:"Trần Gia Bảo", dob:"12/01/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Đặng Gia Hưng", dob:"02/08/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Lâm Gia An", dob:"03/05/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Nguyễn Hoàng Vinh", dob:"17/03/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Trần Chí Trung", dob:"12/12/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Hà Tuyết Nhi", dob:"18/01/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Huỳnh Ngọc Yến", dob:"03/07/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Huỳnh Nguyễn Bảo Như", dob:"07/05/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Nguyễn Hồng Phi", dob:"20/11/2011", gender:"Nam", ethnic:"Khơ-me"},
-  {name:"Nguyễn Quốc Duy", dob:"23/06/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Phù Kim Hên", dob:"27/10/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Trần Đặng Ngọc Lam", dob:"28/01/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Trịnh Tiền Trân", dob:"21/01/2011", gender:"Nữ", ethnic:"Kinh"},
-  {name:"Danh Trung Kiên", dob:"05/10/2011", gender:"Nam", ethnic:"Khơ-me"},
-  {name:"Huỳnh Thiện Nhân", dob:"01/12/2010", gender:"Nam", ethnic:"Kinh"},
-  {name:"Lê Anh Khôi", dob:"06/07/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Trương Quốc Bảo", dob:"24/01/2011", gender:"Nam", ethnic:"Kinh"},
-  {name:"Danh Gia Bảo", dob:"24/09/2011", gender:"Nam", ethnic:"Khơ-me"},
-  {name:"Nguyễn Thị Hồng Tím", dob:"23/06/2011", gender:"Nữ", ethnic:"Kinh"},
-];
+let seats   = {};
+let swaps   = [];
+let roster  = [];          // nạp từ Firebase, chỉ khi đăng nhập giáo viên
+let myUid   = null;
+let isAdmin = false;
 
-let seats = {};
-let swaps = [];
-let adminUnlocked = false;
-
+/* -------------------- TIỆN ÍCH -------------------- */
 function allSeatIds(){
   const ids = [];
   LANES.forEach(l=>{ for(let b=1;b<=l.desks;b++){ ids.push(`d${l.id}-b${b}-T`); ids.push(`d${l.id}-b${b}-P`); } });
@@ -295,57 +277,86 @@ function seatLabel(id){
   return `Dãy ${d.slice(1)} — Bàn ${b.slice(1)} — ghế ${s==='T'?'trái':'phải'}`;
 }
 function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  return String(str==null?'':str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
-
-async function loadAll(){
-  try{ const snap = await seatsRef.once('value'); seats = snap.val() || {}; }
-  catch(e){ seats = {}; }
-  try{
-    const snap = await swapsRef.once('value');
-    const val = snap.val() || {};
-    swaps = Object.keys(val).map(k=> ({id:k, ...val[k]}));
-  }catch(e){ swaps = []; }
+function showMsg(el, text, type){
+  if(!el) return;
+  el.textContent = text; el.className = 'msg show ' + type;
+  setTimeout(()=> el.classList.remove('show'), 4000);
 }
-
-// Ghi/xóa 1 ô chỗ ngồi trên Firebase (không đụng tới các ô khác)
-async function setSeat(id, value){
-  if(value){ seats[id] = value; await seatsRef.child(id).set(value); }
-  else { delete seats[id]; await seatsRef.child(id).remove(); }
-}
-// Tạo 1 yêu cầu đổi chỗ mới trên Firebase
-async function addSwap(swap){
-  const ref = swapsRef.push();
-  await ref.set(swap);
-  swaps.push({id: ref.key, ...swap});
-}
-// Xóa 1 yêu cầu đổi chỗ theo id
-async function removeSwap(id){
-  await swapsRef.child(id).remove();
-  swaps = swaps.filter(s=> s.id !== id);
-}
-// Xóa mọi yêu cầu đổi chỗ liên quan tới 1 ô (khi ô đó bị xóa/đổi)
-async function removeSwapsForSeat(seatId){
-  const related = swaps.filter(s=> s.fromSeatId===seatId || s.toSeatId===seatId);
-  await Promise.all(related.map(s=> swapsRef.child(s.id).remove()));
-  swaps = swaps.filter(s=> s.fromSeatId!==seatId && s.toSeatId!==seatId);
-}
-
-function showMsg(el, text, type){ el.textContent = text; el.className = 'msg show ' + type; setTimeout(()=> el.classList.remove('show'), 3500); }
-
-function findSeatByCred(name, password){
-  name = (name||'').trim();
-  for(const id in seats){
-    const s = seats[id];
-    if(s && s.name.trim().toLowerCase() === name.toLowerCase() && (s.password||'') === (password||'')) return id;
-  }
+function normalizeName(s){ return (s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+function mySeatId(){
+  for(const id in seats){ if(seats[id] && seats[id].uid === myUid) return id; }
   return null;
 }
+function loiThanThien(e){
+  const m = String(e && e.message || e);
+  if(/permission_denied|PERMISSION_DENIED/i.test(m))
+    return 'Không có quyền thực hiện. Ô này thuộc về bạn khác, hoặc em đã đổi máy nên mất quyền sửa — hãy báo thầy.';
+  return 'Có lỗi xảy ra: ' + m;
+}
 
-/* -------------------- RENDER LƯỚI -------------------- */
+/* -------------------- ĐĂNG NHẬP -------------------- */
+/* Học sinh: đăng nhập ẩn danh tự động, không cần thao tác gì.
+   Giáo viên: đăng nhập email/mật khẩu, thay thế phiên ẩn danh. */
+auth.onAuthStateChanged(async user=>{
+  if(!user){
+    try{ await auth.signInAnonymously(); }
+    catch(e){
+      showMsg(document.getElementById('pageMsg'),
+        'Chưa bật Anonymous Authentication trong Firebase Console nên không đăng ký chỗ được.', 'err');
+    }
+    return;
+  }
+  myUid   = user.uid;
+  isAdmin = (user.uid === ADMIN_UID);
+
+  document.getElementById('adminLocked').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('adminPanel').style.display  = isAdmin ? 'block' : 'none';
+
+  if(isAdmin){
+    document.getElementById('adminWho').textContent = 'Đang đăng nhập: ' + (user.email || user.uid);
+    await loadRoster();
+    renderAdmin();
+  } else {
+    roster = [];
+  }
+  render();
+});
+
+document.getElementById('adminUnlockBtn').onclick = async ()=>{
+  const email = document.getElementById('adminEmailInput').value.trim();
+  const pass  = document.getElementById('adminPassInput').value;
+  const errEl = document.getElementById('adminLoginErr');
+  if(!email || !pass){ showMsg(errEl, 'Nhập đủ email và mật khẩu.', 'err'); return; }
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+    document.getElementById('adminPassInput').value = '';
+  }catch(e){
+    showMsg(errEl, 'Đăng nhập thất bại: sai email hoặc mật khẩu.', 'err');
+  }
+};
+document.getElementById('adminSignOutBtn').onclick = async ()=>{
+  await auth.signOut();   // onAuthStateChanged sẽ tự đăng nhập ẩn danh trở lại
+};
+
+/* -------------------- ĐỌC DỮ LIỆU -------------------- */
+async function loadRoster(){
+  try{
+    const snap = await rosterRef.once('value');
+    const v = snap.val();
+    roster = !v ? [] : (Array.isArray(v) ? v.filter(Boolean) : Object.values(v));
+  }catch(e){
+    roster = [];   // không phải giáo viên thì không đọc được, im lặng bỏ qua
+  }
+}
+
+/* -------------------- VẼ SƠ ĐỒ -------------------- */
 function render(){
   const grid = document.getElementById('classroomGrid');
   grid.innerHTML = '';
+  const cuaToi = mySeatId();
+
   LANES.forEach(l=>{
     const lane = document.createElement('div');
     lane.className = 'lane';
@@ -354,377 +365,371 @@ function render(){
       const row = document.createElement('div');
       row.className = `desk-row row-c${((b-1)%7)+1}`;
       const badge = document.createElement('div');
-      badge.className = 'desk-badge';
-      badge.textContent = b;
+      badge.className = 'desk-badge'; badge.textContent = b;
       row.appendChild(badge);
+
       const desk = document.createElement('div'); desk.className = 'desk';
       ['T','P'].forEach(side=>{
         const id = `d${l.id}-b${b}-${side}`;
         const data = seats[id];
         const div = document.createElement('div');
         div.className = 'seat';
-        const hasPending = swaps.some(s => s.status==='pending' && (s.fromSeatId===id || s.toSeatId===id));
+        const coYeuCau = swaps.some(s => s.status==='pending' && (s.fromSeatId===id || s.toSeatId===id));
+
         if(data){
           div.classList.add('taken');
-          if(!data.password) div.classList.add('unlocked');
-          if(hasPending) div.classList.add('pending');
-          const icon = data.password ? '🔒' : '🔓';
-          div.innerHTML = `<span class="seat-name">${escapeHtml(data.name)}</span><span class="lockicon">${hasPending?'🔔':icon}</span>`;
+          const laCuaToi = (id === cuaToi);
+          if(laCuaToi) div.classList.add('mine');
+          if(coYeuCau)  div.classList.add('pending');
+          const icon = coYeuCau ? '🔔' : (laCuaToi ? '✋' : '');
+          div.innerHTML = `<span class="seat-name">${escapeHtml(data.name)}</span>` +
+                          (icon ? `<span class="lockicon">${icon}</span>` : '');
+          div.title = seatLabel(id) + ' — ' + data.name + (laCuaToi ? ' (chỗ của em)' : '');
         } else {
           div.textContent = '+';
+          div.title = seatLabel(id) + ' — Trống';
         }
-        div.title = seatLabel(id) + (data ? (' — ' + data.name) : ' — Trống');
         div.onclick = () => onSeatClick(id);
         desk.appendChild(div);
       });
-      lane.appendChild(row);
       row.appendChild(desk);
+      lane.appendChild(row);
     }
     grid.appendChild(lane);
   });
 }
 
-/* -------------------- MODAL HELPERS -------------------- */
+/* -------------------- MODAL -------------------- */
 function openModal(html){
   document.getElementById('seatModalBody').innerHTML = html;
   document.getElementById('seatModal').classList.add('show');
 }
 function closeModal(){ document.getElementById('seatModal').classList.remove('show'); }
-
-/* -------------------- CLICK VÀO Ô -------------------- */
-async function onSeatClick(seatId){
-  await loadAll();
-  const data = seats[seatId];
-
-  if(!data){
-    openModal(`
-      <h3>Đăng ký chỗ ngồi</h3>
-      <p>${seatLabel(seatId)}</p>
-      <input type="text" id="mName" placeholder="Nhập họ và tên của em">
-      <div id="mErr" class="msg err"></div>
-      <div class="modal-btns">
-        <button class="btn btn-ghost btn-sm" onclick="closeModal()">Hủy</button>
-        <button class="btn btn-primary btn-sm" id="mNext">Tiếp tục</button>
-      </div>`);
-    document.getElementById('mNext').onclick = async ()=>{
-      const name = document.getElementById('mName').value.trim();
-      if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
-      await loadAll();
-      if(seats[seatId]){ showMsg(document.getElementById('mErr'), 'Rất tiếc, ô này vừa có bạn khác đăng ký trước.', 'err'); render(); closeModal(); return; }
-      await setSeat(seatId, {name, password:''});
-      render();
-      openLockStep(seatId, name);
-    };
-    return;
-  }
-
-  // Ô đã có người
-  if(!data.password){
-    openUnlockedEditModal(seatId, data);
-  } else {
-    openLockedSeatModal(seatId, data);
-  }
-}
-
-function openLockStep(seatId, name){
-  openModal(`
-    <h3>Đặt mật khẩu khóa chỗ</h3>
-    <p>Tên <b>${escapeHtml(name)}</b> đã hiện trên sơ đồ. Đặt mật khẩu để không ai giành/sửa được chỗ này.</p>
-    <input type="password" id="mPass" placeholder="Đặt mật khẩu (VD: 4-6 ký tự)">
-    <div id="mErr" class="msg err"></div>
-    <div class="modal-btns">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Để sau</button>
-      <button class="btn btn-primary btn-sm" id="mLock">Khóa lại</button>
-    </div>`);
-  document.getElementById('mLock').onclick = async ()=>{
-    const pass = document.getElementById('mPass').value;
-    if(!pass){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập mật khẩu.', 'err'); return; }
-    await loadAll();
-    if(!seats[seatId] || seats[seatId].name !== name){ closeModal(); render(); return; }
-    await setSeat(seatId, {name, password:pass});
-    render();
-    closeModal();
-  };
-}
-
-function openUnlockedEditModal(seatId, data){
-  openModal(`
-    <h3>${seatLabel(seatId)}</h3>
-    <p>Tên hiện tại: <b>${escapeHtml(data.name)}</b> — chưa khóa mật khẩu, ai cũng sửa được.</p>
-    <input type="text" id="mName" value="${escapeHtml(data.name)}" placeholder="Họ tên">
-    <input type="password" id="mPass" placeholder="Đặt mật khẩu để khóa chỗ này">
-    <div id="mErr" class="msg err"></div>
-    <div class="modal-btns">
-      <button class="btn btn-ghost btn-sm" id="mClear">Bỏ trống chỗ</button>
-      <button class="btn btn-primary btn-sm" id="mSave">Lưu &amp; khóa</button>
-    </div>`);
-  document.getElementById('mSave').onclick = async ()=>{
-    const name = document.getElementById('mName').value.trim();
-    const pass = document.getElementById('mPass').value;
-    if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
-    await loadAll();
-    await setSeat(seatId, {name, password:pass});
-    render(); closeModal();
-  };
-  document.getElementById('mClear').onclick = async ()=>{
-    await loadAll();
-    await setSeat(seatId, null);
-    await removeSwapsForSeat(seatId);
-    render(); closeModal();
-  };
-}
-
-function openLockedSeatModal(seatId, data){
-  const myOutgoing = swaps.find(s=> s.status==='pending' && s.fromSeatId===seatId);
-  const myIncoming = swaps.filter(s=> s.status==='pending' && s.toSeatId===seatId);
-
-  openModal(`
-    <h3>${seatLabel(seatId)}</h3>
-    <p>Đang có: <b>${escapeHtml(data.name)}</b> 🔒</p>
-
-    <div class="section-title">Nếu đây là chỗ của bạn</div>
-    <input type="password" id="ownPass" placeholder="Nhập mật khẩu để mở khóa">
-    <div id="ownErr" class="msg err"></div>
-    <button class="btn btn-primary btn-sm" id="ownUnlockBtn">Mở khóa</button>
-    <div id="ownArea" style="margin-top:10px;"></div>
-
-    <hr>
-    <div class="section-title">Muốn đổi chỗ tới đây?</div>
-    <p>Nhập tên và mật khẩu chỗ hiện tại của bạn để gửi yêu cầu đổi chỗ.</p>
-    <input type="text" id="reqName" placeholder="Họ tên của bạn">
-    <input type="password" id="reqPass" placeholder="Mật khẩu chỗ hiện tại của bạn">
-    <div id="reqErr" class="msg err"></div>
-    <div class="modal-btns">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Đóng</button>
-      <button class="btn btn-blue btn-sm" id="reqBtn">Gửi yêu cầu đổi chỗ</button>
-    </div>`);
-
-  document.getElementById('ownUnlockBtn').onclick = ()=>{
-    const p = document.getElementById('ownPass').value;
-    if(p !== data.password){ showMsg(document.getElementById('ownErr'), 'Sai mật khẩu.', 'err'); return; }
-    let html = `
-      <input type="text" id="ownName" value="${escapeHtml(data.name)}" placeholder="Họ tên">
-      <input type="text" id="ownNewPass" value="${escapeHtml(data.password)}" placeholder="Mật khẩu mới">
-      <div class="modal-btns">
-        <button class="btn btn-ghost btn-sm" id="ownClearBtn">Bỏ trống chỗ</button>
-        <button class="btn btn-primary btn-sm" id="ownSaveBtn">Lưu thay đổi</button>
-      </div>`;
-    if(myOutgoing){
-      html += `<div class="msg info show" style="margin-top:10px;">⏳ Bạn đã gửi yêu cầu đổi chỗ tới <b>${escapeHtml(myOutgoing.toName)}</b>.
-        <br><button class="btn btn-ghost btn-sm" id="cancelOutBtn" style="margin-top:6px;">Hủy yêu cầu</button></div>`;
-    }
-    myIncoming.forEach(r=>{
-      html += `<div class="msg info show" style="margin-top:10px;">🔁 <b>${escapeHtml(r.fromName)}</b> muốn đổi chỗ với bạn.
-        <div class="modal-btns" style="margin-top:8px;">
-          <button class="btn btn-ghost btn-sm" data-decline="${r.id}">Từ chối</button>
-          <button class="btn btn-primary btn-sm" data-accept="${r.id}">Đồng ý</button>
-        </div></div>`;
-    });
-    document.getElementById('ownArea').innerHTML = html;
-
-    document.getElementById('ownSaveBtn').onclick = async ()=>{
-      const newName = document.getElementById('ownName').value.trim();
-      const newPass = document.getElementById('ownNewPass').value;
-      if(!newName) return;
-      await loadAll();
-      await setSeat(seatId, {name:newName, password:newPass});
-      render(); closeModal();
-    };
-    document.getElementById('ownClearBtn').onclick = async ()=>{
-      await loadAll();
-      await setSeat(seatId, null);
-      await removeSwapsForSeat(seatId);
-      render(); closeModal();
-    };
-    const cancelBtn = document.getElementById('cancelOutBtn');
-    if(cancelBtn) cancelBtn.onclick = async ()=>{
-      await loadAll();
-      await removeSwap(myOutgoing.id);
-      render(); closeModal();
-    };
-    document.querySelectorAll('[data-accept]').forEach(b=> b.onclick = ()=> respondSwap(b.getAttribute('data-accept'), true));
-    document.querySelectorAll('[data-decline]').forEach(b=> b.onclick = ()=> respondSwap(b.getAttribute('data-decline'), false));
-  };
-
-  document.getElementById('reqBtn').onclick = async ()=>{
-    const rn = document.getElementById('reqName').value.trim();
-    const rp = document.getElementById('reqPass').value;
-    await loadAll();
-    const fromSeatId = findSeatByCred(rn, rp);
-    if(!fromSeatId){ showMsg(document.getElementById('reqErr'), 'Không tìm thấy chỗ ngồi khớp với tên/mật khẩu này.', 'err'); return; }
-    if(fromSeatId === seatId){ showMsg(document.getElementById('reqErr'), 'Đây đã là chỗ của bạn rồi.', 'err'); return; }
-    if(swaps.some(s=> s.status==='pending' && s.fromSeatId===fromSeatId)){
-      showMsg(document.getElementById('reqErr'), 'Bạn đã có 1 yêu cầu đổi chỗ đang chờ, không thể gửi thêm.', 'err'); return;
-    }
-    await addSwap({ fromSeatId, fromName: seats[fromSeatId].name, toSeatId: seatId, toName: data.name, status:'pending' });
-    showMsg(document.getElementById('pageMsg'), `Đã gửi yêu cầu đổi chỗ tới ${data.name}. Bạn ấy cần chạm vào chỗ của mình để đồng ý.`, 'ok');
-    render(); closeModal();
-  };
-}
-
-async function respondSwap(swapId, accept){
-  await loadAll();
-  const sw = swaps.find(s=>s.id===swapId);
-  if(!sw || sw.status!=='pending'){ render(); closeModal(); return; }
-  if(accept){
-    const a = seats[sw.fromSeatId], b = seats[sw.toSeatId];
-    if(a && b){ await setSeat(sw.fromSeatId, b); await setSeat(sw.toSeatId, a); }
-  }
-  await removeSwap(swapId);
-  render(); closeModal();
-}
-
-/* -------------------- ADMIN -------------------- */
-document.getElementById('adminUnlockBtn').onclick = async ()=>{
-  const pass = document.getElementById('adminPassInput').value;
-  if(pass !== ADMIN_PASSWORD){
-    showMsg(document.getElementById('adminLoginErr'), 'Sai mật khẩu quản trị.', 'err'); return;
-  }
-  adminUnlocked = true;
-  document.getElementById('adminLocked').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'block';
-  await loadAll();
-  renderAdmin();
+document.getElementById('seatModal').onclick = e=>{
+  if(e.target.id === 'seatModal') closeModal();
 };
 
-function normalizeName(s){ return (s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+/* -------------------- BẤM VÀO Ô -------------------- */
+function onSeatClick(seatId){
+  if(!myUid){ showMsg(document.getElementById('pageMsg'), 'Đang kết nối, thử lại sau vài giây.', 'info'); return; }
+  const data = seats[seatId];
+  if(!data)                    return modalDangKy(seatId);
+  if(data.uid === myUid || isAdmin) return modalChoCuaToi(seatId, data);
+  return modalChoNguoiKhac(seatId, data);
+}
 
-function findSeatIdByName(name){
-  const target = normalizeName(name);
-  for(const id in seats){
-    if(seats[id] && normalizeName(seats[id].name) === target) return id;
+/* Ô trống → đăng ký */
+function modalDangKy(seatId){
+  const daCo = mySeatId();
+  if(daCo && !isAdmin){
+    openModal(`
+      <h3>Em đã có chỗ rồi</h3>
+      <p>Chỗ hiện tại của em: <b>${seatLabel(daCo)}</b>.
+      Muốn chuyển sang ô này, hãy vào ô của em và bấm <b>Bỏ chỗ này</b> trước, rồi đăng ký lại.</p>
+      <div class="modal-btns"><button class="btn btn-primary btn-sm" onclick="closeModal()">Đã hiểu</button></div>`);
+    return;
   }
-  return null;
+  openModal(`
+    <h3>Đăng ký chỗ ngồi</h3>
+    <p>${seatLabel(seatId)}</p>
+    <input type="text" id="mName" placeholder="Nhập họ và tên của em" maxlength="60">
+    <div id="mErr" class="msg err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Hủy</button>
+      <button class="btn btn-primary btn-sm" id="mOk">Đăng ký</button>
+    </div>`);
+  document.getElementById('mName').focus();
+  document.getElementById('mOk').onclick = async ()=>{
+    const name = document.getElementById('mName').value.trim();
+    if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
+    if(seats[seatId]){ showMsg(document.getElementById('mErr'), 'Rất tiếc, ô này vừa có bạn khác đăng ký trước.', 'err'); return; }
+    try{
+      await seatsRef.child(seatId).set({ name, uid: myUid });
+      closeModal();
+      showMsg(document.getElementById('pageMsg'), 'Đã đăng ký chỗ ngồi. Ô của em có viền cam.', 'ok');
+    }catch(e){
+      showMsg(document.getElementById('mErr'), loiThanThien(e), 'err');
+    }
+  };
+}
+
+/* Ô của mình (hoặc giáo viên bấm vào ô bất kỳ) */
+function modalChoCuaToi(seatId, data){
+  const yeuCauDen = swaps.filter(s=> s.status==='pending' && s.toSeatId===seatId);
+  const yeuCauDi  = swaps.find(s=> s.status==='pending' && s.fromSeatId===seatId);
+
+  let phuHTML = '';
+  if(yeuCauDi){
+    phuHTML += `<div class="msg info show">⏳ Em đã gửi yêu cầu đổi chỗ tới <b>${escapeHtml(yeuCauDi.toName)}</b>, đang chờ thầy duyệt.
+      <br><button class="btn btn-ghost btn-sm" id="huyYeuCau" style="margin-top:6px;">Hủy yêu cầu</button></div>`;
+  }
+  yeuCauDen.forEach(r=>{
+    phuHTML += `<div class="msg info show">🔁 <b>${escapeHtml(r.fromName)}</b> muốn đổi chỗ với em — chờ thầy duyệt.
+      <br><button class="btn btn-ghost btn-sm" data-tuchoi="${r.id}" style="margin-top:6px;">Từ chối</button></div>`;
+  });
+
+  openModal(`
+    <h3>${seatLabel(seatId)}</h3>
+    <p>${isAdmin && data.uid !== myUid ? 'Chỗ của <b>'+escapeHtml(data.name)+'</b> (thầy có toàn quyền sửa)' : 'Đây là chỗ của em ✋'}</p>
+    <input type="text" id="mName" value="${escapeHtml(data.name)}" placeholder="Họ tên" maxlength="60">
+    <div id="mErr" class="msg err"></div>
+    ${phuHTML}
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" id="mBo">Bỏ chỗ này</button>
+      <button class="btn btn-primary btn-sm" id="mLuu">Lưu tên</button>
+    </div>`);
+
+  document.getElementById('mLuu').onclick = async ()=>{
+    const name = document.getElementById('mName').value.trim();
+    if(!name){ showMsg(document.getElementById('mErr'), 'Vui lòng nhập họ tên.', 'err'); return; }
+    try{
+      await seatsRef.child(seatId).update({ name });
+      closeModal();
+      showMsg(document.getElementById('pageMsg'), 'Đã lưu.', 'ok');
+    }catch(e){ showMsg(document.getElementById('mErr'), loiThanThien(e), 'err'); }
+  };
+  document.getElementById('mBo').onclick = async ()=>{
+    try{
+      await seatsRef.child(seatId).remove();
+      await xoaYeuCauCuaO(seatId);
+      closeModal();
+      showMsg(document.getElementById('pageMsg'), 'Đã bỏ chỗ. Em có thể chọn ô khác.', 'ok');
+    }catch(e){ showMsg(document.getElementById('mErr'), loiThanThien(e), 'err'); }
+  };
+  const btnHuy = document.getElementById('huyYeuCau');
+  if(btnHuy) btnHuy.onclick = async ()=>{
+    try{ await swapsRef.child(yeuCauDi.id).remove(); closeModal(); }
+    catch(e){ showMsg(document.getElementById('mErr'), loiThanThien(e), 'err'); }
+  };
+  document.querySelectorAll('[data-tuchoi]').forEach(b=> b.onclick = async ()=>{
+    try{ await swapsRef.child(b.getAttribute('data-tuchoi')).remove(); closeModal(); }
+    catch(e){ showMsg(document.getElementById('mErr'), loiThanThien(e), 'err'); }
+  });
+}
+
+/* Ô của bạn khác → chỉ xem và xin đổi chỗ */
+function modalChoNguoiKhac(seatId, data){
+  const cuaToi = mySeatId();
+  const daGui  = cuaToi && swaps.some(s=> s.status==='pending' && s.fromSeatId===cuaToi);
+
+  let than = '';
+  if(!cuaToi){
+    than = `<div class="msg info show">Em chưa có chỗ ngồi. Hãy đăng ký một ô trống trước,
+      sau đó mới gửi yêu cầu đổi chỗ được.</div>`;
+  } else if(daGui){
+    than = `<div class="msg info show">Em đã có một yêu cầu đổi chỗ đang chờ duyệt, không gửi thêm được.</div>`;
+  } else {
+    than = `<p>Chỗ của em: <b>${seatLabel(cuaToi)}</b>. Gửi yêu cầu đổi sang ô này, thầy sẽ duyệt.</p>`;
+  }
+
+  openModal(`
+    <h3>${seatLabel(seatId)}</h3>
+    <p>Đang có: <b>${escapeHtml(data.name)}</b></p>
+    ${than}
+    <div id="mErr" class="msg err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Đóng</button>
+      ${cuaToi && !daGui ? '<button class="btn btn-blue btn-sm" id="mGui">Gửi yêu cầu đổi chỗ</button>' : ''}
+    </div>`);
+
+  const btn = document.getElementById('mGui');
+  if(btn) btn.onclick = async ()=>{
+    try{
+      await swapsRef.push({
+        fromSeatId: cuaToi,
+        fromName:   seats[cuaToi].name,
+        fromUid:    myUid,
+        toSeatId:   seatId,
+        toName:     data.name,
+        status:     'pending'
+      });
+      closeModal();
+      showMsg(document.getElementById('pageMsg'),
+        `Đã gửi yêu cầu đổi chỗ tới ${data.name}. Thầy sẽ duyệt.`, 'ok');
+    }catch(e){ showMsg(document.getElementById('mErr'), loiThanThien(e), 'err'); }
+  };
+}
+
+async function xoaYeuCauCuaO(seatId){
+  const lienQuan = swaps.filter(s=> s.fromSeatId===seatId || s.toSeatId===seatId);
+  for(const s of lienQuan){
+    try{ await swapsRef.child(s.id).remove(); }catch(e){}
+  }
+}
+
+/* -------------------- KHU VỰC GIÁO VIÊN -------------------- */
+async function duyetDoiCho(swapId){
+  const sw = swaps.find(s=>s.id===swapId);
+  if(!sw) return;
+  const a = seats[sw.fromSeatId] || null;
+  const b = seats[sw.toSeatId]   || null;
+  const capNhat = {};
+  capNhat[`${ROOT}/seats/${sw.fromSeatId}`] = b;
+  capNhat[`${ROOT}/seats/${sw.toSeatId}`]   = a;
+  try{
+    await db.ref().update(capNhat);
+    await xoaYeuCauCuaO(sw.fromSeatId);
+    await xoaYeuCauCuaO(sw.toSeatId);
+    showMsg(document.getElementById('adminMsg'), 'Đã duyệt và đổi chỗ.', 'ok');
+  }catch(e){ showMsg(document.getElementById('adminMsg'), loiThanThien(e), 'err'); }
 }
 
 function renderAdmin(){
-  const tbl = document.getElementById('adminTable');
-  let rows = `<tr><th>STT</th><th>Vị trí</th><th>Họ tên</th><th>Mật khẩu</th><th></th></tr>`;
-  const occupied = allSeatIds().filter(id=> seats[id]);
-  occupied.sort((a,b)=> a.localeCompare(b));
-  occupied.forEach((id,idx)=>{
-    const d = seats[id];
-    rows += `<tr>
-      <td>${idx+1}</td>
-      <td>${seatLabel(id)}</td>
-      <td><input type="text" id="an-${id}" value="${escapeHtml(d.name)}"></td>
-      <td><input type="text" id="ap-${id}" value="${escapeHtml(d.password||'')}"></td>
-      <td style="white-space:nowrap;">
-        <button class="btn btn-primary btn-sm" data-save="${id}">Lưu</button>
-        <button class="btn btn-ghost btn-sm" data-clear="${id}">Xóa</button>
-      </td></tr>`;
-  });
-  if(!occupied.length) rows += `<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);">Chưa có ai đăng ký.</td></tr>`;
-  tbl.innerHTML = rows;
+  if(!isAdmin) return;
 
-  // Bảng đối chiếu danh sách cả lớp — chỉ liệt kê các bạn CHƯA chọn chỗ
-  const rosterTbl = document.getElementById('rosterTable');
-  const missing = CLASS_ROSTER.filter(st=> !findSeatIdByName(st.name));
-  const registeredCount = CLASS_ROSTER.length - missing.length;
-  document.getElementById('rosterTitle').textContent =
-    `Các bạn chưa chọn chỗ (${registeredCount}/${CLASS_ROSTER.length} đã có chỗ)`;
-  let rrows = `<tr><th>STT</th><th>Họ tên</th><th>Ngày sinh</th><th>Giới tính</th><th>Dân tộc</th></tr>`;
-  if(!missing.length){
-    rrows += `<tr><td colspan="5" style="text-align:center;color:var(--leaf-dark);font-weight:700;">🎉 Tất cả học sinh đã chọn chỗ!</td></tr>`;
+  /* Yêu cầu chờ duyệt */
+  const cho = swaps.filter(s=> s.status==='pending');
+  let s1 = `<tr><th>Từ</th><th>Đến</th><th></th></tr>`;
+  if(!cho.length){
+    s1 += `<tr><td colspan="3" style="text-align:center;color:var(--ink-soft);">Không có yêu cầu nào.</td></tr>`;
   } else {
-    missing.forEach((st, idx)=>{
-      rrows += `<tr style="background:#fdecea;">
-        <td>${idx+1}</td><td>${escapeHtml(st.name)}</td><td>${st.dob}</td><td>${st.gender}</td><td>${st.ethnic}</td>
-      </tr>`;
+    cho.forEach(s=>{
+      s1 += `<tr>
+        <td>${escapeHtml(s.fromName)}<br><small>${seatLabel(s.fromSeatId)}</small></td>
+        <td>${escapeHtml(s.toName)}<br><small>${seatLabel(s.toSeatId)}</small></td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-primary btn-sm" data-duyet="${s.id}">Duyệt</button>
+          <button class="btn btn-ghost btn-sm" data-tuchoiAd="${s.id}">Từ chối</button>
+        </td></tr>`;
     });
   }
-  rosterTbl.innerHTML = rrows;
+  document.getElementById('swapApproveTable').innerHTML = s1;
+  document.querySelectorAll('[data-duyet]').forEach(b=> b.onclick = ()=> duyetDoiCho(b.getAttribute('data-duyet')));
+  document.querySelectorAll('[data-tuchoiAd]').forEach(b=> b.onclick = async ()=>{
+    try{ await swapsRef.child(b.getAttribute('data-tuchoiAd')).remove(); }
+    catch(e){ showMsg(document.getElementById('adminMsg'), loiThanThien(e), 'err'); }
+  });
 
-  document.querySelectorAll('[data-save]').forEach(b=> b.onclick = async ()=>{
-    const id = b.getAttribute('data-save');
+  /* Danh sách chỗ đã đăng ký */
+  const daCo = allSeatIds().filter(id=> seats[id]).sort();
+  let s2 = `<tr><th>STT</th><th>Vị trí</th><th>Họ tên</th><th></th></tr>`;
+  daCo.forEach((id,i)=>{
+    s2 += `<tr>
+      <td>${i+1}</td>
+      <td>${seatLabel(id)}</td>
+      <td><input type="text" id="an-${id}" value="${escapeHtml(seats[id].name)}" maxlength="60"></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-primary btn-sm" data-luu="${id}">Lưu</button>
+        <button class="btn btn-ghost btn-sm" data-xoa="${id}">Xóa</button>
+      </td></tr>`;
+  });
+  if(!daCo.length) s2 += `<tr><td colspan="4" style="text-align:center;color:var(--ink-soft);">Chưa có ai đăng ký.</td></tr>`;
+  document.getElementById('adminTable').innerHTML = s2;
+
+  document.querySelectorAll('[data-luu]').forEach(b=> b.onclick = async ()=>{
+    const id = b.getAttribute('data-luu');
     const name = document.getElementById(`an-${id}`).value.trim();
-    const pass = document.getElementById(`ap-${id}`).value;
     if(!name) return;
-    await loadAll();
-    await setSeat(id, {name, password:pass});
-    render(); renderAdmin();
-    showMsg(document.getElementById('adminMsg'), 'Đã lưu.', 'ok');
+    try{
+      await seatsRef.child(id).update({ name });
+      showMsg(document.getElementById('adminMsg'), 'Đã lưu.', 'ok');
+    }catch(e){ showMsg(document.getElementById('adminMsg'), loiThanThien(e), 'err'); }
   });
-  document.querySelectorAll('[data-clear]').forEach(b=> b.onclick = async ()=>{
-    const id = b.getAttribute('data-clear');
-    await loadAll();
-    await setSeat(id, null);
-    await removeSwapsForSeat(id);
-    render(); renderAdmin();
+  document.querySelectorAll('[data-xoa]').forEach(b=> b.onclick = async ()=>{
+    const id = b.getAttribute('data-xoa');
+    try{
+      await seatsRef.child(id).remove();
+      await xoaYeuCauCuaO(id);
+    }catch(e){ showMsg(document.getElementById('adminMsg'), loiThanThien(e), 'err'); }
   });
 
-  const selA = document.getElementById('swapA'), selB = document.getElementById('swapB');
-  const opts = allSeatIds().map(id=> `<option value="${id}">${seatLabel(id)}${seats[id]? ' — '+escapeHtml(seats[id].name):' (trống)'}</option>`).join('');
-  selA.innerHTML = opts; selB.innerHTML = opts;
+  /* Đối chiếu danh sách lớp */
+  const rt = document.getElementById('rosterTable');
+  let s3 = `<tr><th>STT</th><th>Họ tên</th><th>Ngày sinh</th><th>Giới tính</th><th>Dân tộc</th></tr>`;
+  if(!roster.length){
+    document.getElementById('rosterTitle').textContent = 'Đối chiếu danh sách lớp';
+    s3 += `<tr><td colspan="5" style="text-align:center;color:var(--red);">
+      Chưa đọc được danh sách lớp từ Firebase. Kiểm tra nhánh <b>${ROOT}/roster</b> và Security Rules.</td></tr>`;
+  } else {
+    const tenDaCo = new Set(Object.values(seats).map(s=> normalizeName(s.name)));
+    const thieu = roster.filter(st=> !tenDaCo.has(normalizeName(st.name)));
+    document.getElementById('rosterTitle').textContent =
+      `Các bạn chưa chọn chỗ (${roster.length - thieu.length}/${roster.length} đã có chỗ)`;
+    if(!thieu.length){
+      s3 += `<tr><td colspan="5" style="text-align:center;color:var(--leaf-dark);font-weight:700;">🎉 Tất cả học sinh đã chọn chỗ!</td></tr>`;
+    } else {
+      thieu.forEach((st,i)=>{
+        s3 += `<tr style="background:#fdecea;">
+          <td>${i+1}</td><td>${escapeHtml(st.name)}</td><td>${escapeHtml(st.dob)}</td>
+          <td>${escapeHtml(st.gender)}</td><td>${escapeHtml(st.ethnic)}</td></tr>`;
+      });
+    }
+  }
+  rt.innerHTML = s3;
+
+  /* Đổi chỗ nhanh */
+  const opts = allSeatIds().map(id=>
+    `<option value="${id}">${seatLabel(id)}${seats[id]? ' — '+escapeHtml(seats[id].name):' (trống)'}</option>`).join('');
+  document.getElementById('swapA').innerHTML = opts;
+  document.getElementById('swapB').innerHTML = opts;
 }
 
 document.getElementById('swapBtn').onclick = async ()=>{
   const a = document.getElementById('swapA').value, b = document.getElementById('swapB').value;
   if(a === b) return;
-  await loadAll();
-  const tmp = seats[a] || null, other = seats[b] || null;
-  await setSeat(a, other); await setSeat(b, tmp);
-  await removeSwapsForSeat(a); await removeSwapsForSeat(b);
-  render(); renderAdmin();
-  showMsg(document.getElementById('adminMsg'), 'Đã đổi chỗ.', 'ok');
+  const capNhat = {};
+  capNhat[`${ROOT}/seats/${a}`] = seats[b] || null;
+  capNhat[`${ROOT}/seats/${b}`] = seats[a] || null;
+  try{
+    await db.ref().update(capNhat);
+    await xoaYeuCauCuaO(a); await xoaYeuCauCuaO(b);
+    showMsg(document.getElementById('adminMsg'), 'Đã đổi chỗ.', 'ok');
+  }catch(e){ showMsg(document.getElementById('adminMsg'), loiThanThien(e), 'err'); }
 };
 
 document.getElementById('resetAllBtn').onclick = ()=> document.getElementById('confirmResetModal').classList.add('show');
 document.getElementById('cancelResetBtn').onclick = ()=> document.getElementById('confirmResetModal').classList.remove('show');
 document.getElementById('confirmResetBtn').onclick = async ()=>{
-  await seatsRef.remove();
-  await swapsRef.remove();
-  seats = {}; swaps = [];
+  try{
+    await seatsRef.remove();
+    await swapsRef.remove();
+    showMsg(document.getElementById('adminMsg'), 'Đã xóa toàn bộ sơ đồ.', 'ok');
+  }catch(e){ showMsg(document.getElementById('adminMsg'), loiThanThien(e), 'err'); }
   document.getElementById('confirmResetModal').classList.remove('show');
-  render(); renderAdmin();
-  showMsg(document.getElementById('adminMsg'), 'Đã xóa toàn bộ sơ đồ.', 'ok');
 };
 
-document.getElementById('exportWordBtn').onclick = async ()=>{
-  await loadAll();
+document.getElementById('exportWordBtn').onclick = ()=>{
   const maxB = Math.max(...LANES.map(l=>l.desks));
-  let table = `<table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;">
+  let bang = `<table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;">
     <tr>${LANES.map(l=>`<th style="background:#eaf5ee;">Dãy ${l.id}</th>`).join('')}</tr>`;
   for(let b=1;b<=maxB;b++){
-    table += '<tr>';
+    bang += '<tr>';
     LANES.forEach(l=>{
-      if(b > l.desks){ table += '<td></td>'; return; }
+      if(b > l.desks){ bang += '<td></td>'; return; }
       const t = seats[`d${l.id}-b${b}-T`], p = seats[`d${l.id}-b${b}-P`];
-      table += `<td style="text-align:center;">Bàn ${b}<br>${t? escapeHtml(t.name):'(trống)'} — ${p? escapeHtml(p.name):'(trống)'}</td>`;
+      bang += `<td style="text-align:center;">Bàn ${b}<br>${t? escapeHtml(t.name):'(trống)'} — ${p? escapeHtml(p.name):'(trống)'}</td>`;
     });
-    table += '</tr>';
+    bang += '</tr>';
   }
-  table += '</table>';
+  bang += '</table>';
 
-  const doc = `
-  <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+  const doc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
   <head><meta charset="utf-8"><title>Sơ đồ lớp 10A1</title></head>
   <body style="font-family:Arial;">
     <h2 style="text-align:center;">SƠ ĐỒ LỚP 10A1</h2>
     <p style="text-align:center;">CỬA RA VÀO (trái) — BẢNG LỚP / BỤC GIẢNG (giữa) — BÀN GIÁO VIÊN (phải)</p>
-    ${table}
+    ${bang}
     <p style="text-align:center;margin-top:10px;">— CUỐI LỚP —</p>
   </body></html>`;
 
-  const blob = new Blob(['\ufeff', doc], {type:'application/msword'});
-  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'so-do-lop-10a1.doc';
+  a.href = URL.createObjectURL(new Blob(['﻿', doc], {type:'application/msword'}));
+  a.download = 'so-do-lop-10a1.doc';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(a.href);
 };
 
-// Lắng nghe thay đổi tức thời từ Firebase — không cần chờ, mọi người thấy ngay
+/* -------------------- LẮNG NGHE THAY ĐỔI -------------------- */
 seatsRef.on('value', snap=>{
   seats = snap.val() || {};
   render();
-  if(adminUnlocked) renderAdmin();
+  if(isAdmin) renderAdmin();
 });
 swapsRef.on('value', snap=>{
-  const val = snap.val() || {};
-  swaps = Object.keys(val).map(k=> ({id:k, ...val[k]}));
+  const v = snap.val() || {};
+  swaps = Object.keys(v).map(k=> Object.assign({id:k}, v[k]));
   render();
-  if(adminUnlocked) renderAdmin();
+  if(isAdmin) renderAdmin();
 });
 </script>
 </body>
